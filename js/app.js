@@ -23,7 +23,9 @@
     deferredInstallPrompt: null,
     itinerary: loadItinerarySync(),
     darkMode: localStorage.getItem('darkMode') === 'true',
-    mapPickMode: false
+    mapPickMode: false,
+    visitedSpots: loadVisitedSpots(),
+    currencyRate: parseFloat(localStorage.getItem('okinawa_currency_rate')) || 0.22
   };
 
   // ==================== Data Persistence ====================
@@ -134,13 +136,39 @@
     return _escEl.innerHTML;
   }
 
+  // ==================== Visited Spots ====================
+  function loadVisitedSpots() {
+    try {
+      return JSON.parse(localStorage.getItem('okinawa_visited') || '{}');
+    } catch (e) { return {}; }
+  }
+
+  function toggleVisited(spotId) {
+    if (state.visitedSpots[spotId]) {
+      delete state.visitedSpots[spotId];
+    } else {
+      state.visitedSpots[spotId] = true;
+    }
+    localStorage.setItem('okinawa_visited', JSON.stringify(state.visitedSpots));
+  }
+
+  function isVisited(spotId) {
+    return !!state.visitedSpots[spotId];
+  }
+
+  // ==================== Google Maps ====================
+  function openGoogleMaps(lat, lng, name) {
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&destination_place_id=&travelmode=driving`;
+    window.open(url, '_blank');
+  }
+
   // ==================== Map Init ====================
   function initMap() {
     state.map = L.map('map', {
       center: APP_DATA.center,
       zoom: APP_DATA.defaultZoom,
       zoomControl: true,
-      attributionControl: true
+      attributionControl: false
     });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -221,7 +249,7 @@
     day.spots.forEach((spot, i) => {
       // Spot card
       const card = document.createElement('div');
-      card.className = `spot-card ${state.currentSpot === spot.id ? 'active' : ''}`;
+      card.className = `spot-card ${state.currentSpot === spot.id ? 'active' : ''} ${isVisited(spot.id) ? 'visited' : ''}`;
       card.dataset.spotIndex = i;
       card.dataset.spotId = spot.id;
 
@@ -231,34 +259,34 @@
       }
 
       const reorderHtml = isTouchDevice ? `
-        <div class="spot-reorder" style="display:flex;gap:6px;margin-left:auto;">
-          ${i > 0 ? `<button class="reorder-btn btn-move-up" data-idx="${i}">↑</button>` : ''}
-          ${i < day.spots.length - 1 ? `<button class="reorder-btn btn-move-down" data-idx="${i}">↓</button>` : ''}
-        </div>
+          <div class="spot-reorder" style="display:flex;gap:6px;">
+            ${i > 0 ? `<button class="reorder-btn btn-move-up" data-idx="${i}">↑</button>` : ''}
+            ${i < day.spots.length - 1 ? `<button class="reorder-btn btn-move-down" data-idx="${i}">↓</button>` : ''}
+          </div>
       ` : '';
 
       card.innerHTML = `
         <div class="spot-header">
+          <button class="spot-visited-btn btn-toggle-visited" data-spot-id="${spot.id}" title="打卡">${isVisited(spot.id) ? '✅' : '⬜'}</button>
           <span class="spot-name">${esc(spot.name)}</span>
-          <div class="spot-edit-actions">
-            <button class="spot-edit-btn btn-edit-spot" data-spot-id="${spot.id}" title="編輯">✏️</button>
-            <button class="spot-edit-btn btn-delete-spot" data-spot-id="${spot.id}" title="刪除">🗑️</button>
-          </div>
-          ${reorderHtml}
           <span class="spot-time">${esc(spot.time)} · ${spot.duration}分</span>
         </div>
         <div class="spot-desc">${esc(spot.description)}</div>
         ${spot.tips ? `<div class="spot-tips">💡 ${esc(spot.tips)}</div>` : ''}
         <div class="spot-actions">
           <button class="spot-action-btn btn-navigate" data-spot-id="${spot.id}">🧭 導航</button>
+          <button class="spot-action-btn btn-google-maps" data-lat="${spot.lat}" data-lng="${spot.lng}" data-name="${esc(spot.name)}">🗺️ Google Maps</button>
           <button class="spot-action-btn btn-nearby" data-spot-id="${spot.id}">🍜 附近美食</button>
           <button class="spot-action-btn btn-photo" data-spot-id="${spot.id}">📸 拍照</button>
+          <button class="spot-edit-btn btn-edit-spot" data-spot-id="${spot.id}" title="編輯">✏️</button>
+          <button class="spot-edit-btn btn-delete-spot" data-spot-id="${spot.id}" title="刪除">🗑️</button>
+          ${reorderHtml}
         </div>
       `;
 
       // Click to fly to spot
       card.addEventListener('click', (e) => {
-        if (e.target.closest('.spot-action-btn') || e.target.closest('.reorder-btn') || e.target.closest('.spot-edit-btn')) return;
+        if (e.target.closest('.spot-action-btn') || e.target.closest('.reorder-btn') || e.target.closest('.spot-edit-btn') || e.target.closest('.spot-visited-btn')) return;
         selectSpot(spot);
       });
 
@@ -310,6 +338,23 @@
         e.stopPropagation();
         const spot = findSpot(btn.dataset.spotId);
         if (spot) capturePhoto(spot);
+      });
+    });
+
+    // Google Maps buttons
+    container.querySelectorAll('.btn-google-maps').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openGoogleMaps(btn.dataset.lat, btn.dataset.lng, btn.dataset.name);
+      });
+    });
+
+    // Visited toggle buttons
+    container.querySelectorAll('.btn-toggle-visited').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleVisited(btn.dataset.spotId);
+        renderSpotList();
       });
     });
 
@@ -868,32 +913,251 @@
   function initSidebarToggle() {
     const sidebar = document.getElementById('sidebar');
     const toggle = document.getElementById('sidebar-toggle');
+    const handle = document.getElementById('sheet-handle');
     const isMobile = () => window.innerWidth <= 768;
 
+    // Desktop: simple toggle via button
     toggle.addEventListener('click', () => {
       const isCollapsed = sidebar.classList.toggle('collapsed');
-      toggle.textContent = isMobile()
-        ? (isCollapsed ? '▲' : '▼')
-        : (isCollapsed ? '▶' : '◀');
-      // Invalidate map after CSS transition completes
+      toggle.textContent = isCollapsed ? '▶' : '◀';
       setTimeout(() => state.map.invalidateSize(), 350);
     });
 
-    // Set initial label
-    if (isMobile()) {
-      toggle.textContent = '▼';
+    // Mobile: half ↔ collapsed via swipe, tap handle → open fullscreen modal
+    let sheetCollapsed = false;
+
+    function collapseSheet() {
+      sheetCollapsed = true;
+      sidebar.classList.add('collapsed');
+      setTimeout(() => state.map.invalidateSize(), 350);
     }
 
-    // Re-invalidate map on orientation change / resize
+    function expandSheetHalf() {
+      sheetCollapsed = false;
+      sidebar.classList.remove('collapsed');
+      setTimeout(() => state.map.invalidateSize(), 350);
+    }
+
+    // Tap handle → open fullscreen itinerary modal
+    handle.addEventListener('click', () => {
+      if (!isMobile()) return;
+      openItineraryModal();
+    });
+
+    // Swipe on handle
+    let touchStartY = 0;
+    let touchStartTime = 0;
+
+    handle.addEventListener('touchstart', (e) => {
+      if (!isMobile()) return;
+      touchStartY = e.touches[0].clientY;
+      touchStartTime = Date.now();
+    }, { passive: true });
+
+    handle.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+    }, { passive: false });
+
+    handle.addEventListener('touchend', (e) => {
+      if (!isMobile()) return;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      const dt = Date.now() - touchStartTime;
+      const velocity = Math.abs(dy) / dt;
+
+      if (Math.abs(dy) < 30 && velocity < 0.3) return; // too small, let click handle it
+
+      if (dy < 0) {
+        // Swipe UP → if collapsed restore half, else open fullscreen modal
+        if (sheetCollapsed) expandSheetHalf();
+        else openItineraryModal();
+      } else {
+        // Swipe DOWN → collapse
+        if (!sheetCollapsed) collapseSheet();
+      }
+    }, { passive: true });
+
+    // Re-invalidate map on resize
     let resizeTimer;
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
-        toggle.textContent = isMobile()
-          ? (sidebar.classList.contains('collapsed') ? '▲' : '▼')
-          : (sidebar.classList.contains('collapsed') ? '▶' : '◀');
+        if (!isMobile()) {
+          sidebar.classList.remove('collapsed');
+          toggle.textContent = sidebar.classList.contains('collapsed') ? '▶' : '◀';
+        }
         state.map.invalidateSize();
       }, 200);
+    });
+  }
+
+  // ==================== Fullscreen Itinerary Modal ====================
+  function openItineraryModal() {
+    renderModalDayTabs();
+    renderModalSpotList();
+    openModal('itinerary-modal');
+  }
+
+  function renderModalDayTabs() {
+    const container = document.getElementById('modal-day-tabs');
+    container.innerHTML = '';
+    state.itinerary.forEach((day, i) => {
+      const btn = document.createElement('button');
+      btn.className = `day-tab ${i === state.currentDay ? 'active' : ''}`;
+      btn.innerHTML = `
+        Day ${day.day}
+        <span class="tab-weather">${esc(day.weather.icon)} ${esc(day.weather.temp)}</span>
+      `;
+      btn.addEventListener('click', () => {
+        state.currentDay = i;
+        state.currentSpot = null;
+        // Sync sidebar too
+        renderDayTabs();
+        renderSpotList();
+        showDayOnMap();
+        // Re-render modal
+        renderModalDayTabs();
+        renderModalSpotList();
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  function renderModalSpotList() {
+    const container = document.getElementById('modal-spot-list');
+    container.innerHTML = '';
+    const day = state.itinerary[state.currentDay];
+    if (!day || day.spots.length === 0) {
+      container.innerHTML = '<p style="color:var(--text-secondary);text-align:center;padding:40px 0;">這天還沒有行程，點 ＋ 新增景點吧！</p>';
+      return;
+    }
+
+    const title = document.getElementById('itinerary-modal-title');
+    title.textContent = '📍 ' + (day.title || 'Day ' + day.day);
+
+    day.spots.forEach((spot, i) => {
+      const card = document.createElement('div');
+      card.className = `spot-card ${state.currentSpot === spot.id ? 'active' : ''} ${isVisited(spot.id) ? 'visited' : ''}`;
+
+      card.innerHTML = `
+        <div class="spot-header">
+          <button class="spot-visited-btn btn-toggle-visited" data-spot-id="${spot.id}" title="打卡">${isVisited(spot.id) ? '✅' : '⬜'}</button>
+          <span class="spot-name">${esc(spot.name)}</span>
+          <span class="spot-time">${esc(spot.time)} · ${spot.duration}分</span>
+        </div>
+        <div class="spot-desc">${esc(spot.description)}</div>
+        ${spot.tips ? `<div class="spot-tips">💡 ${esc(spot.tips)}</div>` : ''}
+        <div class="spot-actions">
+          <button class="spot-action-btn btn-navigate" data-spot-id="${spot.id}">🧭 導航</button>
+          <button class="spot-action-btn btn-google-maps" data-lat="${spot.lat}" data-lng="${spot.lng}" data-name="${esc(spot.name)}">🗺️ Google Maps</button>
+          <button class="spot-action-btn btn-nearby" data-spot-id="${spot.id}">🍜 附近美食</button>
+          <button class="spot-action-btn btn-photo" data-spot-id="${spot.id}">📸 拍照</button>
+          <button class="spot-edit-btn btn-edit-spot" data-spot-id="${spot.id}" title="編輯">✏️</button>
+          <button class="spot-edit-btn btn-delete-spot" data-spot-id="${spot.id}" title="刪除">🗑️</button>
+          <div class="spot-reorder" style="display:flex;gap:6px;">
+            ${i > 0 ? `<button class="reorder-btn btn-move-up" data-idx="${i}">↑</button>` : ''}
+            ${i < day.spots.length - 1 ? `<button class="reorder-btn btn-move-down" data-idx="${i}">↓</button>` : ''}
+          </div>
+        </div>
+      `;
+
+      // Tap card → fly to spot on map & close modal
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.spot-action-btn') || e.target.closest('.reorder-btn') || e.target.closest('.spot-edit-btn') || e.target.closest('.spot-visited-btn')) return;
+        selectSpot(spot);
+        closeModal('itinerary-modal');
+      });
+
+      container.appendChild(card);
+
+      // Transport connector
+      if (spot.transportToNext && i < day.spots.length - 1) {
+        const conn = document.createElement('div');
+        conn.className = 'transport-connector';
+        const icon = APP_DATA.transportIcons[spot.transportToNext.mode] || '➡️';
+        conn.innerHTML = `
+          <div class="transport-line" style="background:${spot.transportToNext.color}"></div>
+          <div class="transport-info">
+            ${icon} ${esc(spot.transportToNext.note)} · 約 ${spot.transportToNext.duration} 分鐘
+          </div>
+        `;
+        container.appendChild(conn);
+      }
+    });
+
+    // Bind action buttons in modal
+    container.querySelectorAll('.btn-navigate').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const spot = findSpot(btn.dataset.spotId);
+        if (spot) { navigateToSpot(spot); closeModal('itinerary-modal'); }
+      });
+    });
+
+    container.querySelectorAll('.btn-nearby').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const spot = findSpot(btn.dataset.spotId);
+        if (spot) { showNearbyFood(spot); closeModal('itinerary-modal'); }
+      });
+    });
+
+    container.querySelectorAll('.btn-photo').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const spot = findSpot(btn.dataset.spotId);
+        if (spot) capturePhoto(spot);
+      });
+    });
+
+    // Google Maps buttons in modal
+    container.querySelectorAll('.btn-google-maps').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openGoogleMaps(btn.dataset.lat, btn.dataset.lng, btn.dataset.name);
+      });
+    });
+
+    // Visited toggle buttons in modal
+    container.querySelectorAll('.btn-toggle-visited').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleVisited(btn.dataset.spotId);
+        renderSpotList();
+        renderModalSpotList();
+      });
+    });
+
+    container.querySelectorAll('.btn-edit-spot').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const spot = findSpot(btn.dataset.spotId);
+        if (spot) { closeModal('itinerary-modal'); openSpotEditor(spot); }
+      });
+    });
+
+    container.querySelectorAll('.btn-delete-spot').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        deleteSpot(btn.dataset.spotId);
+        renderModalSpotList();
+      });
+    });
+
+    container.querySelectorAll('.btn-move-up, .btn-move-down').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = parseInt(btn.dataset.idx, 10);
+        const d = state.itinerary[state.currentDay];
+        const targetIdx = btn.classList.contains('btn-move-up') ? idx - 1 : idx + 1;
+        if (targetIdx < 0 || targetIdx >= d.spots.length) return;
+        const [moved] = d.spots.splice(idx, 1);
+        d.spots.splice(targetIdx, 0, moved);
+        recalcTimes(d);
+        saveItinerary();
+        renderSpotList();
+        showDayOnMap();
+        renderModalSpotList();
+      });
     });
   }
 
@@ -1269,6 +1533,192 @@
 
   function deg2rad(deg) { return deg * (Math.PI / 180); }
 
+  // ==================== Travel Tools ====================
+  const PHRASES_DATA = [
+    { cat: '👋 基本招呼', items: [
+      { jp: 'こんにちは', roman: 'Konnichiwa', zh: '你好' },
+      { jp: 'ありがとうございます', roman: 'Arigatou gozaimasu', zh: '非常感謝' },
+      { jp: 'すみません', roman: 'Sumimasen', zh: '不好意思/對不起' },
+      { jp: 'はい / いいえ', roman: 'Hai / Iie', zh: '是/不是' },
+      { jp: 'お願いします', roman: 'Onegaishimasu', zh: '拜託了/請' },
+    ]},
+    { cat: '🍜 餐廳用餐', items: [
+      { jp: '〇名です', roman: '(kazu) mei desu', zh: '我們有○位' },
+      { jp: 'メニューをください', roman: 'Menyuu o kudasai', zh: '請給我菜單' },
+      { jp: 'これをください', roman: 'Kore o kudasai', zh: '請給我這個' },
+      { jp: 'おすすめは何ですか？', roman: 'Osusume wa nan desu ka?', zh: '推薦什麼？' },
+      { jp: 'お会計お願いします', roman: 'Okaikei onegaishimasu', zh: '請結帳' },
+      { jp: 'おいしかったです', roman: 'Oishikatta desu', zh: '很好吃' },
+      { jp: 'アレルギーがあります', roman: 'Arerugii ga arimasu', zh: '我有過敏' },
+    ]},
+    { cat: '🚗 交通問路', items: [
+      { jp: '〇はどこですか？', roman: '(basho) wa doko desu ka?', zh: '○在哪裡？' },
+      { jp: 'この住所に行きたいです', roman: 'Kono juusho ni ikitai desu', zh: '我想去這個地址' },
+      { jp: '駅はどこですか？', roman: 'Eki wa doko desu ka?', zh: '車站在哪裡？' },
+      { jp: 'タクシーを呼んでください', roman: 'Takushii o yonde kudasai', zh: '請幫我叫計程車' },
+      { jp: 'レンタカーを借りたいです', roman: 'Rentakaa o karitai desu', zh: '我想租車' },
+    ]},
+    { cat: '🛍️ 購物', items: [
+      { jp: 'いくらですか？', roman: 'Ikura desu ka?', zh: '多少錢？' },
+      { jp: '試着できますか？', roman: 'Shichaku dekimasu ka?', zh: '可以試穿嗎？' },
+      { jp: '免税できますか？', roman: 'Menzei dekimasu ka?', zh: '可以免稅嗎？' },
+      { jp: 'カードで払えますか？', roman: 'Kaado de haraemasu ka?', zh: '可以刷卡嗎？' },
+      { jp: '袋をください', roman: 'Fukuro o kudasai', zh: '請給我袋子' },
+    ]},
+    { cat: '🆘 緊急求助', items: [
+      { jp: '助けてください！', roman: 'Tasukete kudasai!', zh: '請幫幫我！' },
+      { jp: '警察を呼んでください', roman: 'Keisatsu o yonde kudasai', zh: '請叫警察' },
+      { jp: '病院に行きたいです', roman: 'Byouin ni ikitai desu', zh: '我想去醫院' },
+      { jp: '日本語がわかりません', roman: 'Nihongo ga wakarimasen', zh: '我不懂日語' },
+      { jp: 'パスポートをなくしました', roman: 'Pasupooto o nakushimashita', zh: '我護照丟了' },
+    ]},
+    { cat: '🏨 住宿', items: [
+      { jp: 'チェックインお願いします', roman: 'Chekkuin onegaishimasu', zh: '請幫我辦理入住' },
+      { jp: 'チェックアウトは何時ですか？', roman: 'Chekkuauto wa nanji desu ka?', zh: '退房時間是幾點？' },
+      { jp: 'Wi-Fiのパスワードは？', roman: 'Waifai no pasuwaado wa?', zh: 'Wi-Fi 密碼是？' },
+      { jp: '荷物を預かってもらえますか？', roman: 'Nimotsu o azukatte moraemasu ka?', zh: '可以寄放行李嗎？' },
+    ]},
+  ];
+
+  const EMERGENCY_DATA = [
+    { icon: '🚨', title: '日本報警電話', detail: '遇到犯罪、交通事故', phone: '110' },
+    { icon: '🚑', title: '火災 / 急救 / 救護車', detail: '火災、急病、受傷', phone: '119' },
+    { icon: '🏥', title: '沖繩縣立南部醫療中心', detail: '〒901-1193 沖繩縣島尻郡南風原町字新川118-1', phone: '098-888-0123' },
+    { icon: '🏥', title: '沖繩美軍醫院（急診）', detail: '可收治外國人，24 小時急診', phone: '098-743-7555' },
+    { icon: '🇹🇼', title: '台北駐日經濟文化代表處（那霸）', detail: '〒900-0015 沖繩縣那霸市久茂地3-15-9\nアルテビル那覇 6F', phone: '098-862-7008' },
+    { icon: '📞', title: 'Japan Visitor Hotline', detail: '觀光廳外國旅客諮詢熱線\n24小時對應、支援中文', phone: '050-3816-2787' },
+    { icon: '💳', title: '信用卡掛失', detail: 'VISA: 00531-44-0022\nMastercard: 00531-11-3886\nJCB: 0120-794-082', phone: null },
+    { icon: '📱', title: '海外急難救助（台灣外交部）', detail: '全球免付費緊急聯絡', phone: '+886-800-085-095' },
+  ];
+
+  function initTravelTools() {
+    // Tools modal open
+    document.getElementById('btn-tools').addEventListener('click', () => {
+      openModal('tools-modal');
+    });
+
+    // Tab switching
+    document.querySelectorAll('.tools-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tools-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tools-panel').forEach(p => p.classList.add('hidden'));
+        tab.classList.add('active');
+        document.getElementById('tools-' + tab.dataset.tab).classList.remove('hidden');
+      });
+    });
+
+    // Currency converter
+    initCurrencyConverter();
+
+    // Render phrases & emergency (static content)
+    renderPhrases();
+    renderEmergencyInfo();
+  }
+
+  function initCurrencyConverter() {
+    const jpyInput = document.getElementById('currency-jpy');
+    const twdInput = document.getElementById('currency-twd');
+
+    function updateRateDisplay() {
+      document.getElementById('currency-rate-display').textContent =
+        `1 JPY ≈ ${state.currencyRate.toFixed(4)} TWD`;
+    }
+
+    jpyInput.addEventListener('input', () => {
+      const jpy = parseFloat(jpyInput.value) || 0;
+      twdInput.value = jpy ? Math.round(jpy * state.currencyRate) : '';
+    });
+
+    twdInput.addEventListener('input', () => {
+      const twd = parseFloat(twdInput.value) || 0;
+      jpyInput.value = twd ? Math.round(twd / state.currencyRate) : '';
+    });
+
+    // Quick chips
+    document.querySelectorAll('.currency-quick-chips .chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const jpy = parseInt(chip.dataset.jpy, 10);
+        jpyInput.value = jpy;
+        twdInput.value = Math.round(jpy * state.currencyRate);
+      });
+    });
+
+    // Update rate from API
+    document.getElementById('btn-update-rate').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-update-rate');
+      btn.textContent = '⏳ 查詢中...';
+      btn.disabled = true;
+      try {
+        const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY');
+        const data = await res.json();
+        if (data.rates && data.rates.TWD) {
+          state.currencyRate = data.rates.TWD;
+          localStorage.setItem('okinawa_currency_rate', state.currencyRate.toString());
+          updateRateDisplay();
+          // Re-calc if there's a value
+          if (jpyInput.value) {
+            twdInput.value = Math.round(parseFloat(jpyInput.value) * state.currencyRate);
+          }
+          btn.textContent = '✅ 已更新';
+        } else {
+          btn.textContent = '❌ 失敗';
+        }
+      } catch (e) {
+        btn.textContent = '❌ 離線無法更新';
+      }
+      setTimeout(() => {
+        btn.textContent = '🔄 更新匯率';
+        btn.disabled = false;
+      }, 2000);
+    });
+
+    updateRateDisplay();
+  }
+
+  function renderPhrases() {
+    const container = document.getElementById('phrases-list');
+    container.innerHTML = PHRASES_DATA.map(cat => `
+      <div class="phrases-category">${cat.cat}</div>
+      ${cat.items.map((p, i) => `
+        <div class="phrase-card">
+          <div class="phrase-text">
+            <div class="phrase-jp">${esc(p.jp)}</div>
+            <div class="phrase-roman">${esc(p.roman)}</div>
+            <div class="phrase-zh">${esc(p.zh)}</div>
+          </div>
+          <button class="phrase-speak-btn" data-text="${esc(p.jp)}" title="朗讀">🔊</button>
+        </div>
+      `).join('')}
+    `).join('');
+
+    // TTS speak buttons
+    container.querySelectorAll('.phrase-speak-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(btn.dataset.text);
+          utterance.lang = 'ja-JP';
+          utterance.rate = 0.85;
+          window.speechSynthesis.speak(utterance);
+        }
+      });
+    });
+  }
+
+  function renderEmergencyInfo() {
+    const container = document.getElementById('emergency-list');
+    container.innerHTML = EMERGENCY_DATA.map(e => `
+      <div class="emergency-card">
+        <div class="emergency-icon">${e.icon}</div>
+        <div class="emergency-info">
+          <div class="emergency-title">${esc(e.title)}</div>
+          <div class="emergency-detail">${esc(e.detail)}</div>
+        </div>
+        ${e.phone ? `<a href="tel:${e.phone}" class="emergency-call-btn">📞 ${esc(e.phone)}</a>` : ''}
+      </div>
+    `).join('');
+  }
+
   // ==================== App Init ====================
   async function init() {
     applyDarkMode();
@@ -1286,6 +1736,7 @@
     initSidebarToggle();
     initModals();
     initItineraryEditor();
+    initTravelTools();
     initNotifications();
     initPWAInstall();
     registerServiceWorker();

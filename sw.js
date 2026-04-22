@@ -1,4 +1,4 @@
-const CACHE_NAME = 'okinawa-travel-v2';
+const CACHE_NAME = 'okinawa-travel-v6';
 const TILE_CACHE = 'okinawa-tiles-v1';
 
 const APP_SHELL = [

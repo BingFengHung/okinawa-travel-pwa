@@ -197,15 +197,17 @@ body {
 
 .spot-header {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .spot-name {
   font-size: 15px;
   font-weight: 700;
   color: var(--text);
+  flex: 1;
+  min-width: 0;
 }
 
 .spot-time {
@@ -596,6 +598,34 @@ body {
 .popup-price { font-weight: 600; color: var(--accent); }
 
 /* ====== Spot Editor & Settings ====== */
+
+/* Visited spot indicator */
+.spot-visited-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.spot-visited-btn:active { transform: scale(0.85); }
+.spot-card.visited {
+  border-left-color: #27ae60;
+  opacity: 0.75;
+}
+.spot-card.visited .spot-name {
+  text-decoration: line-through;
+  color: var(--text-secondary);
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
@@ -682,19 +712,13 @@ body {
 .settings-section h3 { font-size: 15px; margin-bottom: 4px; }
 .settings-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
 
-/* Spot card edit/delete actions */
-.spot-edit-actions {
-  display: flex;
-  gap: 4px;
-  margin-left: auto;
-}
-
+/* Spot card edit/delete buttons */
 .spot-edit-btn {
   background: none;
   border: none;
   font-size: 14px;
   cursor: pointer;
-  padding: 2px 6px;
+  padding: 4px 6px;
   border-radius: 6px;
   transition: background 0.2s;
   -webkit-tap-highlight-color: transparent;
@@ -725,6 +749,11 @@ body {
   cursor: pointer;
 }
 .day-tab:hover .day-tab-delete { opacity: 1; }
+
+/* Sheet Handle (hidden on desktop, visible on mobile) */
+.sheet-handle {
+  display: none;
+}
 
 /* FAB (Floating Action Button) */
 .fab {
@@ -784,6 +813,253 @@ body {
   border-color: rgba(255,255,255,0.4);
 }
 
+/* ====== Travel Tools ====== */
+.tools-tabs {
+  display: flex;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 16px;
+  position: sticky;
+  top: 0;
+  background: var(--bg-card);
+  z-index: 1;
+}
+
+.tools-tab {
+  flex: 1;
+  padding: 12px 8px;
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.tools-tab:hover { color: var(--text); }
+.tools-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.tools-panel.hidden { display: none; }
+
+/* Currency Converter */
+.currency-converter {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.currency-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.currency-row label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.currency-row input {
+  padding: 14px 16px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  font-size: 22px;
+  font-weight: 700;
+  background: var(--bg);
+  color: var(--text);
+  text-align: right;
+  font-family: inherit;
+  width: 100%;
+  transition: border-color 0.2s;
+}
+.currency-row input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.currency-arrow {
+  text-align: center;
+  font-size: 20px;
+  color: var(--text-secondary);
+}
+
+.currency-rate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding: 8px 0;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+
+.currency-quick {
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.currency-quick-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.currency-quick-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.chip:hover, .chip:active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* Phrases List */
+.phrases-category {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 20px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--border);
+}
+.phrases-category:first-child { margin-top: 0; }
+
+.phrase-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  transition: transform 0.15s;
+}
+.phrase-card:active { transform: scale(0.98); }
+
+.phrase-text {
+  flex: 1;
+}
+
+.phrase-jp {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.phrase-roman {
+  font-size: 12px;
+  color: var(--accent);
+  margin-bottom: 2px;
+}
+
+.phrase-zh {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.phrase-speak-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.phrase-speak-btn:active {
+  background: var(--accent);
+  transform: scale(0.9);
+}
+
+/* Emergency Info */
+.emergency-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.emergency-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.emergency-info {
+  flex: 1;
+}
+
+.emergency-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.emergency-detail {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.emergency-call-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 20px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.2s;
+}
+.emergency-call-btn:hover { opacity: 0.9; }
+
 /* ====== Responsive — Mobile ====== */
 @media (max-width: 768px) {
   :root {
@@ -815,12 +1091,13 @@ body {
 
   .header-right {
     gap: 0;
+    flex-shrink: 0;
   }
 
   .header-btn {
-    width: 44px;
+    width: 36px;
     height: 44px;
-    font-size: 18px;
+    font-size: 16px;
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -835,13 +1112,12 @@ body {
   #sidebar {
     width: 100%;
     min-width: 100%;
-    height: 50%;
-    max-height: 60%;
+    height: 45%;
     border-right: none;
     border-top: none;
     border-radius: 16px 16px 0 0;
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
-    transition: height 0.3s ease, min-height 0.3s;
+    transition: height 0.3s ease;
     padding-bottom: env(safe-area-inset-bottom);
   }
 
@@ -853,16 +1129,36 @@ body {
     box-shadow: none;
   }
 
-  /* --- Bottom Sheet Handle --- */
-  #sidebar-toggle {
-    right: 50%;
-    transform: translateX(50%);
-    top: -32px;
-    width: 64px;
-    height: 32px;
-    border-radius: 12px 12px 0 0;
-    font-size: 12px;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  /* Hide desktop toggle on mobile */
+  #sidebar-toggle { display: none; }
+
+  /* --- Sheet Handle (mobile drag bar) --- */
+  .sheet-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 0 6px;
+    cursor: grab;
+    touch-action: none;
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .sheet-handle-bar {
+    width: 40px;
+    height: 5px;
+    background: var(--border);
+    border-radius: 3px;
+    transition: background 0.2s;
+  }
+
+  .sheet-handle:active .sheet-handle-bar {
+    background: var(--accent);
+  }
+
+  /* --- Day tab delete hidden on mobile (prevent accidental taps) --- */
+  .day-tab-delete {
+    display: none;
   }
 
   /* --- Map fills remaining space --- */
@@ -908,23 +1204,24 @@ body {
 
   /* --- Reorder Buttons (Mobile) --- */
   .reorder-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 16px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--bg);
-    color: var(--text);
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+    border: none;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    transition: transform 0.15s, background 0.15s;
   }
   .reorder-btn:active {
     background: var(--accent);
-    color: #fff;
-    border-color: var(--accent);
+    transform: scale(0.9);
   }
 
   /* --- Mobile Modals (Bottom Sheet Style) --- */
@@ -968,6 +1265,44 @@ body {
     padding-bottom: calc(16px + env(safe-area-inset-bottom));
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+  }
+
+  /* --- Itinerary modal: true full screen --- */
+  .itinerary-modal-content {
+    max-height: 100vh;
+    max-height: 100dvh;
+    height: 100vh;
+    height: 100dvh;
+    border-radius: 0;
+  }
+
+  .itinerary-modal-content .modal-header {
+    border-radius: 0;
+  }
+
+  .itinerary-modal-content .modal-body {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #modal-day-tabs {
+    display: flex;
+    overflow-x: auto;
+    border-bottom: 2px solid var(--border);
+    background: var(--bg-card);
+    flex-shrink: 0;
+    scrollbar-width: none;
+  }
+  #modal-day-tabs::-webkit-scrollbar { display: none; }
+
+  #modal-spot-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
   }
 
   /* --- Expense form mobile --- */
@@ -1041,6 +1376,22 @@ body {
   .transport-connector {
     padding: 8px 16px;
     font-size: 13px;
+  }
+
+  /* --- Tools tabs mobile --- */
+  .tools-tab {
+    font-size: 13px;
+    padding: 10px 6px;
+  }
+
+  .phrase-speak-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .currency-row input {
+    font-size: 20px;
+    padding: 12px 14px;
   }
 
   /* --- FAB mobile position --- */

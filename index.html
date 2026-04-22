@@ -26,6 +26,7 @@
       <button id="btn-expense" class="header-btn" title="旅費記帳">💰</button>
       <button id="btn-checklist" class="header-btn" title="行前清單">📋</button>
       <button id="btn-photo" class="header-btn" title="照片回憶">📸</button>
+      <button id="btn-tools" class="header-btn" title="旅遊工具">🧰</button>
       <button id="btn-darkmode" class="header-btn" title="深色模式">🌙</button>
       <button id="btn-settings" class="header-btn" title="行程管理">⚙️</button>
     </div>
@@ -36,12 +37,29 @@
     <!-- Sidebar -->
     <aside id="sidebar">
       <button id="sidebar-toggle" aria-label="收合側邊欄">◀</button>
+      <div id="sheet-handle" class="sheet-handle">
+        <div class="sheet-handle-bar"></div>
+      </div>
       <div id="day-tabs"></div>
       <div id="spot-list"></div>
     </aside>
 
     <!-- Map -->
     <div id="map"></div>
+  </div>
+
+  <!-- Fullscreen Itinerary Modal (mobile) -->
+  <div id="itinerary-modal" class="modal hidden">
+    <div class="modal-content itinerary-modal-content">
+      <div class="modal-header">
+        <h2 id="itinerary-modal-title">📍 行程列表</h2>
+        <button class="modal-close" data-modal="itinerary-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="modal-day-tabs"></div>
+        <div id="modal-spot-list"></div>
+      </div>
+    </div>
   </div>
 
   <!-- Expense Modal -->
@@ -208,6 +226,62 @@
           <h3>🔄 重置行程</h3>
           <p class="settings-desc">恢復為內建預設的 7 天行程（離線可用）</p>
           <button id="btn-reset" class="btn-danger">🗑️ 重置為預設</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Travel Tools Modal -->
+  <div id="tools-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🧰 旅遊工具</h2>
+        <button class="modal-close" data-modal="tools-modal">&times;</button>
+      </div>
+      <div class="modal-body" style="padding-top:0;">
+        <div class="tools-tabs">
+          <button class="tools-tab active" data-tab="currency">💱 匯率</button>
+          <button class="tools-tab" data-tab="phrases">🗣️ 日語</button>
+          <button class="tools-tab" data-tab="emergency">🆘 緊急</button>
+        </div>
+
+        <!-- Currency Converter -->
+        <div id="tools-currency" class="tools-panel">
+          <div class="currency-converter">
+            <div class="currency-row">
+              <label>🇯🇵 日幣 (JPY)</label>
+              <input type="number" id="currency-jpy" placeholder="0" min="0">
+            </div>
+            <div class="currency-arrow">⇄</div>
+            <div class="currency-row">
+              <label>🇹🇼 台幣 (TWD)</label>
+              <input type="number" id="currency-twd" placeholder="0" min="0">
+            </div>
+            <div class="currency-rate">
+              <span>匯率：<strong id="currency-rate-display">1 JPY ≈ 0.22 TWD</strong></span>
+              <button id="btn-update-rate" class="btn-sm">🔄 更新匯率</button>
+            </div>
+            <div class="currency-quick">
+              <span class="currency-quick-label">快速換算：</span>
+              <div class="currency-quick-chips">
+                <button class="chip" data-jpy="500">¥500</button>
+                <button class="chip" data-jpy="1000">¥1,000</button>
+                <button class="chip" data-jpy="3000">¥3,000</button>
+                <button class="chip" data-jpy="5000">¥5,000</button>
+                <button class="chip" data-jpy="10000">¥10,000</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Japanese Phrases -->
+        <div id="tools-phrases" class="tools-panel hidden">
+          <div id="phrases-list"></div>
+        </div>
+
+        <!-- Emergency Info -->
+        <div id="tools-emergency" class="tools-panel hidden">
+          <div id="emergency-list"></div>
         </div>
       </div>
     </div>
