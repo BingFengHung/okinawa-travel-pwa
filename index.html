@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>沖繩旅遊地圖</title>
+  <meta name="description" content="7天6夜沖繩離線旅遊地圖">
+  <meta name="theme-color" content="#0f3460">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.svg">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header id="header">
+    <div class="header-left">
+      <span class="logo">🌴</span>
+      <h1>沖繩旅遊地圖</h1>
+    </div>
+    <div class="header-right">
+      <button id="btn-weather" class="header-btn" title="天氣預報">🌤️</button>
+      <button id="btn-expense" class="header-btn" title="旅費記帳">💰</button>
+      <button id="btn-checklist" class="header-btn" title="行前清單">📋</button>
+      <button id="btn-photo" class="header-btn" title="照片回憶">📸</button>
+      <button id="btn-darkmode" class="header-btn" title="深色模式">🌙</button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div id="main">
+    <!-- Sidebar -->
+    <aside id="sidebar">
+      <button id="sidebar-toggle" aria-label="收合側邊欄">◀</button>
+      <div id="day-tabs"></div>
+      <div id="spot-list"></div>
+    </aside>
+
+    <!-- Map -->
+    <div id="map"></div>
+  </div>
+
+  <!-- Expense Modal -->
+  <div id="expense-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>💰 旅費記帳</h2>
+        <button class="modal-close" data-modal="expense-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="expense-form">
+          <select id="expense-category">
+            <option value="food">🍜 餐飲</option>
+            <option value="transport">🚗 交通</option>
+            <option value="ticket">🎫 門票</option>
+            <option value="shopping">🛍️ 購物</option>
+            <option value="hotel">🏨 住宿</option>
+            <option value="other">📦 其他</option>
+          </select>
+          <input type="text" id="expense-name" placeholder="項目名稱">
+          <input type="number" id="expense-amount" placeholder="金額 (JPY)" min="0">
+          <button id="expense-add">新增</button>
+        </div>
+        <div id="expense-summary"></div>
+        <div id="expense-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checklist Modal -->
+  <div id="checklist-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📋 行前備忘清單</h2>
+        <button class="modal-close" data-modal="checklist-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="checklist-items"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Weather Modal -->
+  <div id="weather-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🌤️ 7 天天氣預報</h2>
+        <button class="modal-close" data-modal="weather-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="weather-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Photo Modal -->
+  <div id="photo-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📸 景點照片</h2>
+        <button class="modal-close" data-modal="photo-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="photo-gallery"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Permission Banner -->
+  <div id="notification-banner" class="hidden">
+    <p>🔔 開啟通知以接收景點到達提醒</p>
+    <button id="btn-allow-notify">允許</button>
+    <button id="btn-dismiss-notify">稍後</button>
+  </div>
+
+  <!-- Install PWA Banner -->
+  <div id="install-banner" class="hidden">
+    <p>📱 加到主畫面可離線使用</p>
+    <button id="btn-install">安裝</button>
+    <button id="btn-dismiss-install">稍後</button>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
