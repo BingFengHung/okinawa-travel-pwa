@@ -1278,6 +1278,7 @@ body {
 
   .itinerary-modal-content .modal-header {
     border-radius: 0;
+    padding-top: calc(12px + env(safe-area-inset-top));
   }
 
   .itinerary-modal-content .modal-body {
