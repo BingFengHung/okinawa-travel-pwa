@@ -1268,17 +1268,20 @@ body {
   }
 
   /* --- Itinerary modal: true full screen --- */
+  #itinerary-modal {
+    align-items: stretch;
+    padding: 0;
+    padding-top: var(--header-height);
+  }
+
   .itinerary-modal-content {
-    max-height: 100vh;
-    max-height: 100dvh;
-    height: 100vh;
-    height: 100dvh;
+    max-height: none;
+    height: 100%;
     border-radius: 0;
   }
 
   .itinerary-modal-content .modal-header {
     border-radius: 0;
-    padding-top: calc(12px + env(safe-area-inset-top));
   }
 
   .itinerary-modal-content .modal-body {

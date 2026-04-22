@@ -158,7 +158,7 @@
 
   // ==================== Google Maps ====================
   function openGoogleMaps(lat, lng, name) {
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&destination_place_id=&travelmode=driving`;
+    const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
     window.open(url, '_blank');
   }
 
