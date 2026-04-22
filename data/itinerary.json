@@ -5,10 +5,10 @@
     "title": "Day 1 — 抵達沖繩 & 國際通",
     "weather": {
       "icon": "⛅",
-      "temp": "29°C",
-      "desc": "多雲時晴",
-      "humidity": "75%",
-      "wind": "南風 4m/s"
+      "temp": "--°C",
+      "desc": "待更新",
+      "humidity": "--",
+      "wind": "--"
     },
     "spots": [
       {
@@ -34,6 +34,22 @@
             "type": "restaurant",
             "cuisine": "🍜 沖繩麵",
             "price": "¥750"
+          },
+          {
+            "name": "A&W 那霸空港店",
+            "lat": 26.2062,
+            "lng": 127.6458,
+            "type": "restaurant",
+            "cuisine": "🍔 美式速食",
+            "price": "¥700"
+          },
+          {
+            "name": "ポークたまごおにぎり本店 空港1F店",
+            "lat": 26.2056,
+            "lng": 127.6462,
+            "type": "restaurant",
+            "cuisine": "🍙 飯糰",
+            "price": "¥350"
           }
         ]
       },
@@ -107,6 +123,22 @@
             "price": "¥800"
           },
           {
+            "name": "ステーキハウス88 國際通店",
+            "lat": 26.2152,
+            "lng": 127.6838,
+            "type": "restaurant",
+            "cuisine": "🥩 牛排",
+            "price": "¥2000"
+          },
+          {
+            "name": "鹽屋 國際通店",
+            "lat": 26.2156,
+            "lng": 127.685,
+            "type": "restaurant",
+            "cuisine": "🍦 冰淇淋",
+            "price": "¥400"
+          },
+          {
             "name": "FamilyMart 國際通",
             "lat": 26.2158,
             "lng": 127.684,
@@ -122,10 +154,10 @@
     "title": "Day 2 — 那霸文化探索",
     "weather": {
       "icon": "🌤️",
-      "temp": "30°C",
-      "desc": "晴時多雲",
-      "humidity": "72%",
-      "wind": "南東風 3m/s"
+      "temp": "--°C",
+      "desc": "待更新",
+      "humidity": "--",
+      "wind": "--"
     },
     "spots": [
       {
@@ -151,6 +183,22 @@
             "type": "restaurant",
             "cuisine": "🐟 海鮮丼",
             "price": "¥1000"
+          },
+          {
+            "name": "泊いゆまち 鮮魚直賣",
+            "lat": 26.2252,
+            "lng": 127.6768,
+            "type": "restaurant",
+            "cuisine": "🍣 生魚片",
+            "price": "¥800"
+          },
+          {
+            "name": "海鮮天婦羅攤",
+            "lat": 26.2249,
+            "lng": 127.6772,
+            "type": "restaurant",
+            "cuisine": "🍤 天婦羅",
+            "price": "¥500"
           }
         ]
       },
@@ -175,6 +223,14 @@
             "lat": 26.2175,
             "lng": 127.668,
             "type": "convenience"
+          },
+          {
+            "name": "波之上茶屋",
+            "lat": 26.2176,
+            "lng": 127.6672,
+            "type": "restaurant",
+            "cuisine": "🍵 甜點",
+            "price": "¥500"
           }
         ]
       },
@@ -201,6 +257,22 @@
             "type": "restaurant",
             "cuisine": "🍤 天婦羅",
             "price": "¥100/個"
+          },
+          {
+            "name": "松原屋製菓",
+            "lat": 26.2138,
+            "lng": 127.6865,
+            "type": "restaurant",
+            "cuisine": "🍡 沖繩菓子",
+            "price": "¥200"
+          },
+          {
+            "name": "壺屋やちむん通り茶屋",
+            "lat": 26.2135,
+            "lng": 127.688,
+            "type": "restaurant",
+            "cuisine": "🍵 茶屋",
+            "price": "¥600"
           }
         ]
       },
@@ -219,7 +291,16 @@
           "color": "#f39c12"
         },
         "tips": "適合親子同樂，建議穿淺色衣服拍照更好看",
-        "nearby": []
+        "nearby": [
+          {
+            "name": "T Galleria 美食區",
+            "lat": 26.2318,
+            "lng": 127.6925,
+            "type": "restaurant",
+            "cuisine": "🍽️ 輕食",
+            "price": "¥800"
+          }
+        ]
       },
       {
         "id": "d2s5",
@@ -261,6 +342,22 @@
             "type": "restaurant",
             "cuisine": "🍽️ 美食街",
             "price": "¥900"
+          },
+          {
+            "name": "やっぱりステーキ おもろまち店",
+            "lat": 26.233,
+            "lng": 127.6958,
+            "type": "restaurant",
+            "cuisine": "🥩 牛排",
+            "price": "¥1000"
+          },
+          {
+            "name": "スターバックス おもろまち",
+            "lat": 26.2322,
+            "lng": 127.6955,
+            "type": "restaurant",
+            "cuisine": "☕ 咖啡",
+            "price": "¥500"
           }
         ]
       }
@@ -272,10 +369,10 @@
     "title": "Day 3 — 水族館·首里城·美國村",
     "weather": {
       "icon": "☀️",
-      "temp": "31°C",
-      "desc": "晴天",
-      "humidity": "70%",
-      "wind": "南風 3m/s"
+      "temp": "--°C",
+      "desc": "待更新",
+      "humidity": "--",
+      "wind": "--"
     },
     "spots": [
       {
@@ -301,6 +398,22 @@
             "type": "restaurant",
             "cuisine": "🍽️ 美食街",
             "price": "¥900"
+          },
+          {
+            "name": "丸亀製麺 iias沖繩豐崎店",
+            "lat": 26.1546,
+            "lng": 127.6555,
+            "type": "restaurant",
+            "cuisine": "🍜 烏龍麵",
+            "price": "¥500"
+          },
+          {
+            "name": "沖繩そば やんばる iias店",
+            "lat": 26.1549,
+            "lng": 127.656,
+            "type": "restaurant",
+            "cuisine": "🍜 沖繩麵",
+            "price": "¥750"
           }
         ]
       },
@@ -327,6 +440,22 @@
             "type": "restaurant",
             "cuisine": "🍜 沖繩麵",
             "price": "¥700"
+          },
+          {
+            "name": "首里殿内",
+            "lat": 26.2168,
+            "lng": 127.7188,
+            "type": "restaurant",
+            "cuisine": "🍱 琉球料理",
+            "price": "¥1500"
+          },
+          {
+            "name": "ぶくぶく茶屋",
+            "lat": 26.2172,
+            "lng": 127.7192,
+            "type": "restaurant",
+            "cuisine": "🍵 沖繩茶",
+            "price": "¥500"
           }
         ]
       },
@@ -361,6 +490,22 @@
             "type": "restaurant",
             "cuisine": "🍣 迴轉壽司",
             "price": "¥1500"
+          },
+          {
+            "name": "タコライスcafe きじむなぁ",
+            "lat": 26.3278,
+            "lng": 127.7652,
+            "type": "restaurant",
+            "cuisine": "🌮 塔可飯",
+            "price": "¥800"
+          },
+          {
+            "name": "Blue Seal 美浜店",
+            "lat": 26.3272,
+            "lng": 127.7655,
+            "type": "restaurant",
+            "cuisine": "🍦 冰淇淋",
+            "price": "¥400"
           },
           {
             "name": "Lawson 美國村",
@@ -407,10 +552,10 @@
     "title": "Day 4 — 美麗海水族館·古宇利島",
     "weather": {
       "icon": "⛅",
-      "temp": "30°C",
-      "desc": "多雲時晴",
-      "humidity": "74%",
-      "wind": "東南風 4m/s"
+      "temp": "--°C",
+      "desc": "待更新",
+      "humidity": "--",
+      "wind": "--"
     },
     "spots": [
       {
@@ -436,6 +581,14 @@
             "type": "restaurant",
             "cuisine": "🍱 定食",
             "price": "¥1000"
+          },
+          {
+            "name": "オーシャンブルー (Ocean Blue)",
+            "lat": 26.6942,
+            "lng": 127.8782,
+            "type": "restaurant",
+            "cuisine": "☕ 水槽景觀咖啡",
+            "price": "¥700"
           },
           {
             "name": "FamilyMart 本部",
@@ -477,7 +630,16 @@
           "color": "#3498db"
         },
         "tips": "可搭乘自動駕駛高爾夫球車上塔，海景絕美",
-        "nearby": []
+        "nearby": [
+          {
+            "name": "古宇利島 Ocean Tower Cafe",
+            "lat": 26.7048,
+            "lng": 128.0135,
+            "type": "restaurant",
+            "cuisine": "☕ 海景咖啡",
+            "price": "¥600"
+          }
+        ]
       },
       {
         "id": "d4s4",
@@ -494,7 +656,16 @@
           "color": "#3498db"
         },
         "tips": "份量十足的蒜蓉蝦飯，古宇利島必吃美食",
-        "nearby": []
+        "nearby": [
+          {
+            "name": "YOSHIKA (古宇利島冰淇淋)",
+            "lat": 26.7128,
+            "lng": 128.0248,
+            "type": "restaurant",
+            "cuisine": "🍦 冰淇淋",
+            "price": "¥350"
+          }
+        ]
       },
       {
         "id": "d4s5",
@@ -522,6 +693,22 @@
             "type": "restaurant",
             "cuisine": "🍔 美式速食",
             "price": "¥700"
+          },
+          {
+            "name": "サーティワン (31冰淇淋)",
+            "lat": 26.3342,
+            "lng": 127.7732,
+            "type": "restaurant",
+            "cuisine": "🍦 冰淇淋",
+            "price": "¥400"
+          },
+          {
+            "name": "丸亀製麺 ライカム店",
+            "lat": 26.3346,
+            "lng": 127.7738,
+            "type": "restaurant",
+            "cuisine": "🍜 烏龍麵",
+            "price": "¥500"
           }
         ]
       }
@@ -533,10 +720,10 @@
     "title": "Day 5 — 親子購物·殘波岬度假",
     "weather": {
       "icon": "🌤️",
-      "temp": "31°C",
-      "desc": "晴時多雲",
-      "humidity": "73%",
-      "wind": "南風 3m/s"
+      "temp": "--°C",
+      "desc": "待更新",
+      "humidity": "--",
+      "wind": "--"
     },
     "spots": [
       {
@@ -554,7 +741,24 @@
           "color": "#3498db"
         },
         "tips": "嬰幼兒服飾、玩具、用品應有盡有",
-        "nearby": []
+        "nearby": [
+          {
+            "name": "港川外人住宅街 oHacorte",
+            "lat": 26.2945,
+            "lng": 127.7485,
+            "type": "restaurant",
+            "cuisine": "🍰 水果塔",
+            "price": "¥600"
+          },
+          {
+            "name": "港川外人住宅街 ippe coppe",
+            "lat": 26.2948,
+            "lng": 127.7478,
+            "type": "restaurant",
+            "cuisine": "🍞 天然酵母麵包",
+            "price": "¥400"
+          }
+        ]
       },
       {
         "id": "d5s2",
@@ -615,6 +819,14 @@
             "type": "restaurant",
             "cuisine": "🍽️ 自助餐",
             "price": "¥2000"
+          },
+          {
+            "name": "花織そば",
+            "lat": 26.4415,
+            "lng": 127.7125,
+            "type": "restaurant",
+            "cuisine": "🍜 沖繩麵",
+            "price": "¥800"
           }
         ]
       }
@@ -626,10 +838,10 @@
     "title": "Day 6 — Outlet 購物·歸程",
     "weather": {
       "icon": "☀️",
-      "temp": "32°C",
-      "desc": "晴天",
-      "humidity": "68%",
-      "wind": "南東風 3m/s"
+      "temp": "--°C",
+      "desc": "待更新",
+      "humidity": "--",
+      "wind": "--"
     },
     "spots": [
       {
@@ -655,6 +867,22 @@
             "type": "restaurant",
             "cuisine": "🍽️ 美食街",
             "price": "¥900"
+          },
+          {
+            "name": "沖繩そば やんばる Outlet店",
+            "lat": 26.1582,
+            "lng": 127.6508,
+            "type": "restaurant",
+            "cuisine": "🍜 沖繩麵",
+            "price": "¥750"
+          },
+          {
+            "name": "Blue Seal ASHIBINAA店",
+            "lat": 26.1576,
+            "lng": 127.6512,
+            "type": "restaurant",
+            "cuisine": "🍦 冰淇淋",
+            "price": "¥400"
           }
         ]
       },
@@ -693,6 +921,22 @@
             "type": "restaurant",
             "cuisine": "🍜 沖繩麵",
             "price": "¥750"
+          },
+          {
+            "name": "A&W 那霸空港店",
+            "lat": 26.2062,
+            "lng": 127.6458,
+            "type": "restaurant",
+            "cuisine": "🍔 美式速食",
+            "price": "¥700"
+          },
+          {
+            "name": "ポークたまごおにぎり本店 空港1F店",
+            "lat": 26.2056,
+            "lng": 127.6462,
+            "type": "restaurant",
+            "cuisine": "🍙 飯糰",
+            "price": "¥350"
           }
         ]
       }

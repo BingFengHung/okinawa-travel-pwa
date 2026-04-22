@@ -4,13 +4,21 @@
 
 :root {
   --bg: #f5f6fa;
+
   --bg-card: #ffffff;
+
   --text: #2c3e50;
+
   --text-secondary: #7f8c8d;
+
   --primary: #0f3460;
+
   --primary-light: #16213e;
+
   --accent: #e94560;
+
   --border: #dcdde1;
+
   --shadow: 0 2px 8px rgba(0,0,0,0.1);
   --radius: 12px;
   --sidebar-width: 360px;
@@ -19,10 +27,15 @@
 
 .dark {
   --bg: #1a1a2e;
+
   --bg-card: #16213e;
+
   --text: #eee;
+
   --text-secondary: #aaa;
+
   --border: #2c3e50;
+
   --shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
@@ -38,6 +51,7 @@ body {
 
 /* ====== Header ====== */
 #header {
+
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -45,6 +59,7 @@ body {
   padding: 0 16px;
   background: var(--primary);
   color: #fff;
+
   z-index: 1000;
   position: relative;
 }
@@ -67,6 +82,7 @@ body {
   background: none;
   border: none;
   color: #fff;
+
   font-size: 20px;
   width: 40px;
   height: 40px;
@@ -78,12 +94,14 @@ body {
 
 /* ====== Main Layout ====== */
 #main {
+
   display: flex;
   height: calc(100vh - var(--header-height));
 }
 
 /* ====== Sidebar ====== */
 #sidebar {
+
   width: var(--sidebar-width);
   background: var(--bg);
   border-right: 1px solid var(--border);
@@ -97,12 +115,14 @@ body {
 }
 
 #sidebar.collapsed {
+
   width: 0;
   min-width: 0;
   border-right: none;
 }
 
 #sidebar-toggle {
+
   position: absolute;
   right: -28px;
   top: 50%;
@@ -111,6 +131,7 @@ body {
   height: 56px;
   background: var(--primary);
   color: #fff;
+
   border: none;
   border-radius: 0 8px 8px 0;
   cursor: pointer;
@@ -123,8 +144,10 @@ body {
 }
 #sidebar-toggle:hover { background: var(--accent); }
 
+
 /* Day Tabs */
 #day-tabs {
+
   display: flex;
   overflow-x: auto;
   border-bottom: 2px solid var(--border);
@@ -133,6 +156,7 @@ body {
   scrollbar-width: none;
 }
 #day-tabs::-webkit-scrollbar { display: none; }
+
 
 .day-tab {
   flex-shrink: 0;
@@ -161,6 +185,7 @@ body {
 
 /* Spot List */
 #spot-list {
+
   flex: 1;
   overflow-y: auto;
   padding: 12px;
@@ -257,6 +282,7 @@ body {
 .spot-action-btn:hover {
   background: var(--accent);
   color: #fff;
+
   border-color: var(--accent);
 }
 
@@ -286,6 +312,7 @@ body {
 
 /* ====== Map ====== */
 #map {
+
   flex: 1;
   z-index: 1;
 }
@@ -349,6 +376,7 @@ body {
 
 /* Expense */
 #expense-form {
+
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -356,7 +384,9 @@ body {
 }
 
 #expense-form select,
+
 #expense-form input {
+
   padding: 8px 12px;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -366,13 +396,18 @@ body {
 }
 
 #expense-form select { flex: 0 0 100%; }
+
 #expense-form input[type="text"] { flex: 1; }
+
 #expense-form input[type="number"] { width: 120px; }
 
+
 #expense-add {
+
   padding: 8px 20px;
   background: var(--accent);
   color: #fff;
+
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -381,7 +416,9 @@ body {
 }
 #expense-add:hover { opacity: 0.9; }
 
+
 #expense-summary {
+
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -401,6 +438,7 @@ body {
   padding: 6px 12px;
   background: var(--accent);
   color: #fff;
+
   border-radius: 20px;
   font-size: 13px;
   font-weight: 700;
@@ -473,6 +511,16 @@ body {
 .weather-info h3 { font-size: 14px; font-weight: 600; }
 .weather-temp { font-size: 24px; font-weight: 700; color: var(--accent); }
 .weather-detail { font-size: 12px; color: var(--text-secondary); }
+.weather-date { font-size: 12px; color: var(--text-secondary); margin-bottom: 2px; }
+.weather-note {
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  background: var(--card-bg);
+  color: var(--text-secondary);
+  text-align: center;
+}
 
 /* Photo */
 .photo-spot-section {
@@ -515,13 +563,16 @@ body {
 
 /* ====== Banners ====== */
 #notification-banner,
+
 #install-banner {
+
   position: fixed;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   background: var(--primary);
   color: #fff;
+
   padding: 12px 20px;
   border-radius: var(--radius);
   display: flex;
@@ -535,7 +586,9 @@ body {
 .hidden { display: none !important; }
 
 #notification-banner button,
+
 #install-banner button {
+
   padding: 6px 16px;
   border: none;
   border-radius: 8px;
@@ -545,15 +598,21 @@ body {
 }
 
 #btn-allow-notify,
+
 #btn-install {
+
   background: var(--accent);
   color: #fff;
+
 }
 
 #btn-dismiss-notify,
+
 #btn-dismiss-install {
+
   background: rgba(255,255,255,0.2);
   color: #fff;
+
 }
 
 /* ====== Map Markers ====== */
@@ -567,13 +626,17 @@ body {
   font-size: 16px;
   font-weight: 700;
   color: #fff;
+
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
 .marker-spot { background: var(--accent); }
 .marker-food { background: #27ae60; }
+
 .marker-convenience { background: #3498db; }
+
 .marker-current { background: #8e44ad; animation: pulse 2s infinite; }
+
 
 @keyframes pulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(142,68,173,0.4); }
@@ -595,6 +658,7 @@ body {
 
 .popup-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
 .popup-detail { font-size: 12px; color: #666; }
+
 .popup-price { font-weight: 600; color: var(--accent); }
 
 /* ====== Spot Editor & Settings ====== */
@@ -619,6 +683,7 @@ body {
 .spot-visited-btn:active { transform: scale(0.85); }
 .spot-card.visited {
   border-left-color: #27ae60;
+
   opacity: 0.75;
 }
 .spot-card.visited .spot-name {
@@ -665,6 +730,7 @@ body {
   padding: 12px;
   background: var(--accent);
   color: #fff;
+
   border: none;
   border-radius: 10px;
   font-size: 15px;
@@ -703,6 +769,7 @@ body {
   transition: all 0.2s;
 }
 .btn-danger:hover { background: var(--accent); color: #fff; }
+
 
 .settings-section {
   padding: 16px 0;
@@ -765,6 +832,7 @@ body {
   border-radius: 50%;
   background: var(--accent);
   color: #fff;
+
   border: none;
   font-size: 28px;
   font-weight: 700;
@@ -782,6 +850,7 @@ body {
 
 /* Map Pick Overlay */
 #map-pick-overlay {
+
   position: fixed;
   top: 0;
   left: 0;
@@ -798,6 +867,7 @@ body {
   padding: 14px 20px;
   background: var(--accent);
   color: #fff;
+
   font-size: 15px;
   font-weight: 600;
   pointer-events: auto;
@@ -810,6 +880,7 @@ body {
   padding: 8px 16px;
   background: rgba(255,255,255,0.2);
   color: #fff;
+
   border-color: rgba(255,255,255,0.4);
 }
 
@@ -942,6 +1013,7 @@ body {
 .chip:hover, .chip:active {
   background: var(--accent);
   color: #fff;
+
   border-color: var(--accent);
 }
 
@@ -997,6 +1069,7 @@ body {
   border-radius: 50%;
   background: var(--primary);
   color: #fff;
+
   font-size: 18px;
   cursor: pointer;
   flex-shrink: 0;
@@ -1050,6 +1123,7 @@ body {
   border-radius: 20px;
   background: var(--accent);
   color: #fff;
+
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -1077,6 +1151,7 @@ body {
 
   /* --- Mobile Header --- */
   #header {
+
     height: var(--header-height);
     padding: 0 8px;
   }
@@ -1103,6 +1178,7 @@ body {
 
   /* --- Mobile Main Layout --- */
   #main {
+
     flex-direction: column-reverse;
     height: calc(100vh - var(--header-height));
     height: calc(100dvh - var(--header-height));
@@ -1110,6 +1186,7 @@ body {
 
   /* --- Mobile Sidebar (Bottom Sheet) --- */
   #sidebar {
+
     width: 100%;
     min-width: 100%;
     height: 45%;
@@ -1122,6 +1199,7 @@ body {
   }
 
   #sidebar.collapsed {
+
     height: 0;
     min-height: 0;
     min-width: 100%;
@@ -1131,6 +1209,7 @@ body {
 
   /* Hide desktop toggle on mobile */
   #sidebar-toggle { display: none; }
+
 
   /* --- Sheet Handle (mobile drag bar) --- */
   .sheet-handle {
@@ -1163,6 +1242,7 @@ body {
 
   /* --- Map fills remaining space --- */
   #map {
+
     flex: 1;
     min-height: 30%;
   }
@@ -1211,6 +1291,7 @@ body {
     border-radius: 50%;
     background: var(--primary);
     color: #fff;
+
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -1269,6 +1350,7 @@ body {
 
   /* --- Itinerary modal: true full screen --- */
   #itinerary-modal {
+
     align-items: stretch;
     padding: 0;
     padding-top: var(--header-height);
@@ -1292,6 +1374,7 @@ body {
   }
 
   #modal-day-tabs {
+
     display: flex;
     overflow-x: auto;
     border-bottom: 2px solid var(--border);
@@ -1301,7 +1384,9 @@ body {
   }
   #modal-day-tabs::-webkit-scrollbar { display: none; }
 
+
   #modal-spot-list {
+
     flex: 1;
     overflow-y: auto;
     padding: 12px;
@@ -1311,17 +1396,21 @@ body {
 
   /* --- Expense form mobile --- */
   #expense-form {
+
     gap: 10px;
   }
 
   #expense-form select,
+
   #expense-form input {
+
     font-size: 16px;
     padding: 10px 12px;
     min-height: 44px;
   }
 
   #expense-add {
+
     width: 100%;
     padding: 12px;
     font-size: 16px;
@@ -1352,7 +1441,9 @@ body {
 
   /* --- Banners mobile --- */
   #notification-banner,
+
   #install-banner {
+
     bottom: calc(12px + env(safe-area-inset-bottom));
     left: 8px;
     right: 8px;
@@ -1363,14 +1454,18 @@ body {
   }
 
   #notification-banner p,
+
   #install-banner p {
+
     width: 100%;
     text-align: center;
     margin-bottom: 4px;
   }
 
   #notification-banner button,
+
   #install-banner button {
+
     padding: 10px 20px;
     font-size: 14px;
     min-height: 40px;
@@ -1423,12 +1518,16 @@ body {
   .header-btn:active { background: rgba(255,255,255,0.2); }
   .spot-action-btn:hover { background: var(--bg); color: var(--text); border-color: var(--border); }
   .spot-action-btn:active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
 }
 
 /* ====== Scrollbar ====== */
 #spot-list::-webkit-scrollbar { width: 6px; }
+
 #spot-list::-webkit-scrollbar-track { background: transparent; }
+
 #spot-list::-webkit-scrollbar-thumb {
+
   background: var(--border);
   border-radius: 3px;
 }

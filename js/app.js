@@ -1,11 +1,15 @@
 // ==============================
+
 // 沖繩旅遊地圖 — 主邏輯
+
 // ==============================
+
 
 (function () {
   'use strict';
 
   // ==================== State ====================
+
   const STORAGE_KEY = 'okinawa_itinerary';
   const GITHUB_ITINERARY_URL = 'https://bingfenghung.github.io/okinawa-travel-pwa/data/itinerary.json';
 
@@ -29,7 +33,9 @@
   };
 
   // ==================== Data Persistence ====================
+
   // Synchronous load from localStorage (used at startup)
+
   function loadItinerarySync() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -46,10 +52,12 @@
   }
 
   // First-visit: fetch from GitHub if no localStorage data exists
+
   async function loadItineraryFromGitHub() {
     if (localStorage.getItem(STORAGE_KEY)) return false;
     try {
-      const res = await fetch(GITHUB_ITINERARY_URL, { cache: 'no-cache' });
+      const cacheBuster = '?t=' + Date.now();
+      const res = await fetch(GITHUB_ITINERARY_URL + cacheBuster, { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       if (!Array.isArray(data) || data.length === 0) throw new Error('Invalid format');
@@ -63,13 +71,20 @@
   }
 
   // Force reload from GitHub (user-triggered)
+
   async function reloadFromGitHub() {
     const btn = document.getElementById('btn-reload-github');
     const originalText = btn.textContent;
     btn.textContent = '⏳ 載入中...';
     btn.disabled = true;
     try {
-      const res = await fetch(GITHUB_ITINERARY_URL, { cache: 'no-cache' });
+      // Add cache-busting query to bypass GitHub Pages CDN cache
+
+      const cacheBuster = '?t=' + Date.now();
+      const res = await fetch(GITHUB_ITINERARY_URL + cacheBuster, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' }
+      });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       if (!Array.isArray(data) || data.length === 0) throw new Error('Invalid format');
@@ -82,9 +97,10 @@
       showDayOnMap();
       scheduleNotifications();
       closeModal('settings-modal');
-      alert('✅ 已從 GitHub 重新載入行程！');
+      alert('✅ 已從 GitHub 重新載入行程！（共 ' + data.length + ' 天）');
     } catch (e) {
-      alert('❌ 載入失敗：' + e.message + '\n請確認網路連線或 GitHub 上有行程檔案。');
+      console.error('GitHub reload failed:', e);
+      alert('❌ 載入失敗：' + e.message + '\n請確認網路連線或 GitHub 上有行程檔案。\nURL: ' + GITHUB_ITINERARY_URL);
     } finally {
       btn.textContent = originalText;
       btn.disabled = false;
@@ -130,6 +146,7 @@
   }
 
   // ==================== HTML Escaping ====================
+
   const _escEl = document.createElement('div');
   function esc(str) {
     _escEl.textContent = str || '';
@@ -137,6 +154,7 @@
   }
 
   // ==================== Visited Spots ====================
+
   function loadVisitedSpots() {
     try {
       return JSON.parse(localStorage.getItem('okinawa_visited') || '{}');
@@ -157,12 +175,14 @@
   }
 
   // ==================== Google Maps ====================
+
   function openGoogleMaps(lat, lng, name) {
     const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
     window.open(url, '_blank');
   }
 
   // ==================== Map Init ====================
+
   function initMap() {
     state.map = L.map('map', {
       center: APP_DATA.center,
@@ -182,6 +202,7 @@
   }
 
   // ==================== Custom Markers ====================
+
   function createIcon(className, label) {
     return L.divIcon({
       className: '',
@@ -192,6 +213,7 @@
   }
 
   // ==================== Sidebar Rendering ====================
+
   function renderDayTabs() {
     const container = document.getElementById('day-tabs');
     container.innerHTML = '';
@@ -213,6 +235,7 @@
     });
 
     // Delete day handlers
+
     container.querySelectorAll('.day-tab-delete').forEach(el => {
       el.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -222,6 +245,7 @@
     });
 
     // Add day button
+
     const addBtn = document.createElement('button');
     addBtn.className = 'day-tab-add';
     addBtn.textContent = '＋';
@@ -248,12 +272,14 @@
 
     day.spots.forEach((spot, i) => {
       // Spot card
+
       const card = document.createElement('div');
       card.className = `spot-card ${state.currentSpot === spot.id ? 'active' : ''} ${isVisited(spot.id) ? 'visited' : ''}`;
       card.dataset.spotIndex = i;
       card.dataset.spotId = spot.id;
 
       // Only enable drag on non-touch devices
+
       if (!isTouchDevice) {
         card.draggable = true;
       }
@@ -276,7 +302,7 @@
         <div class="spot-actions">
           <button class="spot-action-btn btn-navigate" data-spot-id="${spot.id}">🧭 導航</button>
           <button class="spot-action-btn btn-google-maps" data-lat="${spot.lat}" data-lng="${spot.lng}" data-name="${esc(spot.name)}">🗺️ Google Maps</button>
-          <button class="spot-action-btn btn-nearby" data-spot-id="${spot.id}">🍜 附近美食</button>
+          ${spot.nearby && spot.nearby.length > 0 ? `<button class="spot-action-btn btn-nearby" data-spot-id="${spot.id}">🍜 附近美食</button>` : ''}
           <button class="spot-action-btn btn-photo" data-spot-id="${spot.id}">📸 拍照</button>
           <button class="spot-edit-btn btn-edit-spot" data-spot-id="${spot.id}" title="編輯">✏️</button>
           <button class="spot-edit-btn btn-delete-spot" data-spot-id="${spot.id}" title="刪除">🗑️</button>
@@ -285,12 +311,14 @@
       `;
 
       // Click to fly to spot
+
       card.addEventListener('click', (e) => {
         if (e.target.closest('.spot-action-btn') || e.target.closest('.reorder-btn') || e.target.closest('.spot-edit-btn') || e.target.closest('.spot-visited-btn')) return;
         selectSpot(spot);
       });
 
       // Drag & Drop (desktop only)
+
       if (!isTouchDevice) {
         card.addEventListener('dragstart', onDragStart);
         card.addEventListener('dragover', onDragOver);
@@ -302,6 +330,7 @@
       container.appendChild(card);
 
       // Transport connector
+
       if (spot.transportToNext && i < day.spots.length - 1) {
         const conn = document.createElement('div');
         conn.className = 'transport-connector';
@@ -317,6 +346,7 @@
     });
 
     // Bind action buttons
+
     container.querySelectorAll('.btn-navigate').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -342,6 +372,7 @@
     });
 
     // Google Maps buttons
+
     container.querySelectorAll('.btn-google-maps').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -350,6 +381,7 @@
     });
 
     // Visited toggle buttons
+
     container.querySelectorAll('.btn-toggle-visited').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -359,6 +391,7 @@
     });
 
     // Mobile reorder buttons
+
     container.querySelectorAll('.btn-move-up, .btn-move-down').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -376,6 +409,7 @@
     });
 
     // Edit/Delete spot buttons
+
     container.querySelectorAll('.btn-edit-spot').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -401,6 +435,7 @@
   }
 
   // ==================== Map Display ====================
+
   function showDayOnMap() {
     state.markerLayer.clearLayers();
     state.routeLayer.clearLayers();
@@ -424,6 +459,7 @@
     });
 
     // Draw connecting lines between spots
+
     if (day.spots.length > 1) {
       for (let i = 0; i < day.spots.length - 1; i++) {
         const from = day.spots[i];
@@ -455,6 +491,7 @@
   }
 
   // ==================== Navigation (Route Drawing) ====================
+
   function navigateToSpot(spot) {
     state.routeLayer.clearLayers();
     state.currentSpot = spot.id;
@@ -477,6 +514,7 @@
     const to = [toSpot.lat, toSpot.lng];
 
     // Draw polyline
+
     const polyline = L.polyline([from, to], {
       color: '#e94560',
       weight: 4,
@@ -485,11 +523,13 @@
     }).addTo(state.routeLayer);
 
     // Current position marker
+
     L.marker(from, {
       icon: createIcon('marker-current', '📍')
     }).addTo(state.routeLayer).bindPopup('目前位置');
 
     // Destination marker
+
     L.marker(to, {
       icon: createIcon('marker-spot', '🏁')
     }).addTo(state.routeLayer).bindPopup(`
@@ -498,8 +538,10 @@
     `);
 
     // Distance & estimated time
+
     const dist = calcDistance(from[0], from[1], to[0], to[1]);
     const estTime = Math.ceil(dist / 40 * 60); // avg 40km/h
+
 
     L.popup()
       .setLatLng([(from[0] + to[0]) / 2, (from[1] + to[1]) / 2])
@@ -513,6 +555,7 @@
   }
 
   // ==================== Geolocation ====================
+
   function getCurrentPosition() {
     return new Promise((resolve) => {
       if (!navigator.geolocation) {
@@ -562,6 +605,7 @@
   }
 
   // ==================== Nearby Food ====================
+
   function showNearbyFood(spot) {
     state.nearbyLayer.clearLayers();
     if (!spot.nearby || spot.nearby.length === 0) {
@@ -590,6 +634,7 @@
   }
 
   // ==================== Notifications ====================
+
   function initNotifications() {
     if (!('Notification' in window)) return;
     if (Notification.permission === 'default') {
@@ -611,6 +656,7 @@
 
   function scheduleNotifications() {
     // Clear existing timers
+
     state.notifyTimers.forEach(t => clearTimeout(t));
     state.notifyTimers = [];
 
@@ -623,6 +669,7 @@
         spotDate.setHours(h, m, 0, 0);
 
         // 15 minutes before
+
         const notifyTime = new Date(spotDate.getTime() - 15 * 60 * 1000);
         const delay = notifyTime.getTime() - now.getTime();
 
@@ -641,6 +688,7 @@
   }
 
   // ==================== Expense Tracker ====================
+
   function getExpenses() {
     return JSON.parse(localStorage.getItem('okinawa_expenses') || '[]');
   }
@@ -686,6 +734,7 @@
     const listEl = document.getElementById('expense-list');
 
     // Summary
+
     const totals = {};
     let grandTotal = 0;
     expenses.forEach(e => {
@@ -718,6 +767,7 @@
   }
 
   // ==================== Checklist ====================
+
   function getChecklist() {
     const saved = JSON.parse(localStorage.getItem('okinawa_checklist') || '{}');
     return APP_DATA.checklist.map(item => ({
@@ -753,22 +803,172 @@
     });
   }
 
+  // ==================== Weather API (Open-Meteo) ====================
+
+  const WEATHER_CACHE_KEY = 'okinawa_weather_cache';
+  const WEATHER_CACHE_TTL = 3 * 60 * 60 * 1000; // 3 hours
+
+
+  function getWeatherIconAndDesc(wmoCode) {
+    const map = {
+      0: { icon: '☀️', desc: '晴天' },
+      1: { icon: '🌤️', desc: '大致晴朗' },
+      2: { icon: '⛅', desc: '多雲' },
+      3: { icon: '☁️', desc: '陰天' },
+      45: { icon: '🌫️', desc: '霧' },
+      48: { icon: '🌫️', desc: '霧凇' },
+      51: { icon: '🌦️', desc: '小毛毛雨' },
+      53: { icon: '🌦️', desc: '毛毛雨' },
+      55: { icon: '🌧️', desc: '大毛毛雨' },
+      61: { icon: '🌧️', desc: '小雨' },
+      63: { icon: '🌧️', desc: '中雨' },
+      65: { icon: '🌧️', desc: '大雨' },
+      71: { icon: '❄️', desc: '小雪' },
+      73: { icon: '❄️', desc: '中雪' },
+      75: { icon: '❄️', desc: '大雪' },
+      80: { icon: '🌦️', desc: '陣雨' },
+      81: { icon: '🌧️', desc: '中陣雨' },
+      82: { icon: '⛈️', desc: '大陣雨' },
+      95: { icon: '⛈️', desc: '雷陣雨' },
+      96: { icon: '⛈️', desc: '雷陣雨伴冰雹' },
+      99: { icon: '⛈️', desc: '強雷陣雨伴冰雹' }
+    };
+    return map[wmoCode] || { icon: '🌤️', desc: `天氣代碼 ${wmoCode}` };
+  }
+
+  function getWindDirection(degrees) {
+    const dirs = ['北', '北東', '東', '南東', '南', '南西', '西', '北西'];
+    return dirs[Math.round(degrees / 45) % 8] + '風';
+  }
+
+  async function fetchWeatherFromAPI() {
+    // Check cache
+
+    try {
+      const cached = JSON.parse(localStorage.getItem(WEATHER_CACHE_KEY) || '{}');
+      if (cached.data && cached.timestamp && (Date.now() - cached.timestamp < WEATHER_CACHE_TTL)) {
+        return cached.data;
+      }
+    } catch (e) { /* ignore */ }
+
+    // Collect dates from itinerary
+
+    const dates = state.itinerary.map(d => d.date).filter(Boolean);
+    if (dates.length === 0) return null;
+
+    const startDate = dates[0];
+    const endDate = dates[dates.length - 1];
+
+    // Open-Meteo forecast API (free, no key needed, up to 16 days)
+
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=26.33&longitude=127.77&daily=weather_code,temperature_2m_max,temperature_2m_min,relative_humidity_2m_mean,wind_speed_10m_max,wind_direction_10m_dominant&start_date=${startDate}&end_date=${endDate}&timezone=Asia%2FTokyo`;
+
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+
+      if (!json.daily || !json.daily.time) return null;
+
+      const weatherMap = {};
+      json.daily.time.forEach((date, i) => {
+        const wmo = json.daily.weather_code[i];
+        const { icon, desc } = getWeatherIconAndDesc(wmo);
+        const tMax = Math.round(json.daily.temperature_2m_max[i]);
+        const tMin = Math.round(json.daily.temperature_2m_min[i]);
+        const humidity = json.daily.relative_humidity_2m_mean ? Math.round(json.daily.relative_humidity_2m_mean[i]) : '--';
+        const windSpeed = Math.round(json.daily.wind_speed_10m_max[i] / 3.6); // km/h → m/s
+
+        const windDir = json.daily.wind_direction_10m_dominant ? getWindDirection(json.daily.wind_direction_10m_dominant[i]) : '';
+
+        weatherMap[date] = {
+          icon,
+          temp: `${tMax}°C / ${tMin}°C`,
+          desc,
+          humidity: `${humidity}%`,
+          wind: `${windDir} ${windSpeed}m/s`
+        };
+      });
+
+      // Cache result
+
+      try {
+        localStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify({ data: weatherMap, timestamp: Date.now() }));
+      } catch (e) { /* ignore */ }
+
+      return weatherMap;
+    } catch (e) {
+      console.warn('Weather API failed:', e);
+      return null;
+    }
+  }
+
+  async function updateWeatherData() {
+    const weatherMap = await fetchWeatherFromAPI();
+    if (!weatherMap) return false;
+
+    let updated = false;
+    state.itinerary.forEach(day => {
+      if (day.date && weatherMap[day.date]) {
+        day.weather = weatherMap[day.date];
+        updated = true;
+      }
+    });
+
+    if (updated) {
+      saveItinerary();
+      renderDayTabs();
+    }
+    return updated;
+  }
+
   // ==================== Weather Display ====================
+
   function renderWeather() {
     const container = document.getElementById('weather-list');
-    container.innerHTML = state.itinerary.map(day => `
-      <div class="weather-card">
-        <div class="weather-icon">${day.weather.icon}</div>
-        <div class="weather-info">
-          <h3>${day.title}</h3>
-          <div class="weather-temp">${day.weather.temp}</div>
-          <div class="weather-detail">${day.weather.desc} · ${day.weather.humidity} · ${day.weather.wind}</div>
+
+    // Show loading state + trigger API fetch
+
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">⏳ 正在取得最新天氣資料...</div>';
+
+    fetchWeatherFromAPI().then(weatherMap => {
+      if (weatherMap) {
+        state.itinerary.forEach(day => {
+          if (day.date && weatherMap[day.date]) {
+            day.weather = weatherMap[day.date];
+          }
+        });
+        saveItinerary();
+        renderDayTabs();
+      }
+
+      // Check if any date is within forecast range
+
+      const now = new Date();
+      const firstDate = new Date(state.itinerary[0]?.date);
+      const daysDiff = Math.ceil((firstDate - now) / 86400000);
+      const forecastNote = daysDiff > 16
+        ? `<div class="weather-note">📅 行程日期尚未進入預報範圍（約 ${daysDiff} 天後），天氣資料將在出發前 ~16 天內自動更新</div>`
+        : weatherMap
+          ? '<div class="weather-note">✅ 已從 Open-Meteo 取得即時預報</div>'
+          : '<div class="weather-note">⚠️ 無法取得天氣資料，顯示的是快取或預設值</div>';
+
+      container.innerHTML = forecastNote + state.itinerary.map(day => `
+        <div class="weather-card">
+          <div class="weather-icon">${day.weather.icon}</div>
+          <div class="weather-info">
+            <h3>${esc(day.title)}</h3>
+            <div class="weather-date">${day.date || ''}</div>
+            <div class="weather-temp">${day.weather.temp}</div>
+            <div class="weather-detail">${day.weather.desc} · ${day.weather.humidity} · ${day.weather.wind}</div>
+          </div>
         </div>
-      </div>
-    `).join('');
+      `).join('');
+    });
   }
 
   // ==================== Photo Capture ====================
+
   function getPhotos() {
     return JSON.parse(localStorage.getItem('okinawa_photos') || '{}');
   }
@@ -791,6 +991,7 @@
       const reader = new FileReader();
       reader.onload = (ev) => {
         // Compress to max 200KB
+
         compressImage(ev.target.result, 800, 0.7).then(compressed => {
           savePhoto(spot.id, compressed);
           renderPhotoGallery();
@@ -837,6 +1038,7 @@
   }
 
   // ==================== Dark Mode ====================
+
   function toggleDarkMode() {
     state.darkMode = !state.darkMode;
     document.body.classList.toggle('dark', state.darkMode);
@@ -853,6 +1055,7 @@
   }
 
   // ==================== Drag & Drop (Reorder Spots) ====================
+
   let dragIndex = null;
 
   function onDragStart(e) {
@@ -883,6 +1086,7 @@
     day.spots.splice(toIndex, 0, moved);
 
     // Recalculate times
+
     recalcTimes(day);
     renderSpotList();
     showDayOnMap();
@@ -910,6 +1114,7 @@
   }
 
   // ==================== Sidebar Toggle ====================
+
   function initSidebarToggle() {
     const sidebar = document.getElementById('sidebar');
     const toggle = document.getElementById('sidebar-toggle');
@@ -917,6 +1122,7 @@
     const isMobile = () => window.innerWidth <= 768;
 
     // Desktop: simple toggle via button
+
     toggle.addEventListener('click', () => {
       const isCollapsed = sidebar.classList.toggle('collapsed');
       toggle.textContent = isCollapsed ? '▶' : '◀';
@@ -924,6 +1130,7 @@
     });
 
     // Mobile: half ↔ collapsed via swipe, tap handle → open fullscreen modal
+
     let sheetCollapsed = false;
 
     function collapseSheet() {
@@ -939,12 +1146,14 @@
     }
 
     // Tap handle → open fullscreen itinerary modal
+
     handle.addEventListener('click', () => {
       if (!isMobile()) return;
       openItineraryModal();
     });
 
     // Swipe on handle
+
     let touchStartY = 0;
     let touchStartTime = 0;
 
@@ -966,17 +1175,21 @@
 
       if (Math.abs(dy) < 30 && velocity < 0.3) return; // too small, let click handle it
 
+
       if (dy < 0) {
         // Swipe UP → if collapsed restore half, else open fullscreen modal
+
         if (sheetCollapsed) expandSheetHalf();
         else openItineraryModal();
       } else {
         // Swipe DOWN → collapse
+
         if (!sheetCollapsed) collapseSheet();
       }
     }, { passive: true });
 
     // Re-invalidate map on resize
+
     let resizeTimer;
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimer);
@@ -991,6 +1204,7 @@
   }
 
   // ==================== Fullscreen Itinerary Modal ====================
+
   function openItineraryModal() {
     renderModalDayTabs();
     renderModalSpotList();
@@ -1011,10 +1225,12 @@
         state.currentDay = i;
         state.currentSpot = null;
         // Sync sidebar too
+
         renderDayTabs();
         renderSpotList();
         showDayOnMap();
         // Re-render modal
+
         renderModalDayTabs();
         renderModalSpotList();
       });
@@ -1049,7 +1265,7 @@
         <div class="spot-actions">
           <button class="spot-action-btn btn-navigate" data-spot-id="${spot.id}">🧭 導航</button>
           <button class="spot-action-btn btn-google-maps" data-lat="${spot.lat}" data-lng="${spot.lng}" data-name="${esc(spot.name)}">🗺️ Google Maps</button>
-          <button class="spot-action-btn btn-nearby" data-spot-id="${spot.id}">🍜 附近美食</button>
+          ${spot.nearby && spot.nearby.length > 0 ? `<button class="spot-action-btn btn-nearby" data-spot-id="${spot.id}">🍜 附近美食</button>` : ''}
           <button class="spot-action-btn btn-photo" data-spot-id="${spot.id}">📸 拍照</button>
           <button class="spot-edit-btn btn-edit-spot" data-spot-id="${spot.id}" title="編輯">✏️</button>
           <button class="spot-edit-btn btn-delete-spot" data-spot-id="${spot.id}" title="刪除">🗑️</button>
@@ -1061,6 +1277,7 @@
       `;
 
       // Tap card → fly to spot on map & close modal
+
       card.addEventListener('click', (e) => {
         if (e.target.closest('.spot-action-btn') || e.target.closest('.reorder-btn') || e.target.closest('.spot-edit-btn') || e.target.closest('.spot-visited-btn')) return;
         selectSpot(spot);
@@ -1070,6 +1287,7 @@
       container.appendChild(card);
 
       // Transport connector
+
       if (spot.transportToNext && i < day.spots.length - 1) {
         const conn = document.createElement('div');
         conn.className = 'transport-connector';
@@ -1085,6 +1303,7 @@
     });
 
     // Bind action buttons in modal
+
     container.querySelectorAll('.btn-navigate').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1110,6 +1329,7 @@
     });
 
     // Google Maps buttons in modal
+
     container.querySelectorAll('.btn-google-maps').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1118,6 +1338,7 @@
     });
 
     // Visited toggle buttons in modal
+
     container.querySelectorAll('.btn-toggle-visited').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1162,6 +1383,7 @@
   }
 
   // ==================== Modal Management ====================
+
   function openModal(id) {
     document.getElementById(id).classList.remove('hidden');
   }
@@ -1172,11 +1394,13 @@
 
   function initModals() {
     // Close buttons
+
     document.querySelectorAll('.modal-close').forEach(btn => {
       btn.addEventListener('click', () => closeModal(btn.dataset.modal));
     });
 
     // Click backdrop to close
+
     document.querySelectorAll('.modal').forEach(modal => {
       modal.addEventListener('click', (e) => {
         if (e.target === modal) modal.classList.add('hidden');
@@ -1184,6 +1408,7 @@
     });
 
     // Header buttons
+
     document.getElementById('btn-weather').addEventListener('click', () => {
       renderWeather();
       openModal('weather-modal');
@@ -1207,14 +1432,17 @@
     document.getElementById('btn-darkmode').addEventListener('click', toggleDarkMode);
 
     // Settings
+
     document.getElementById('btn-settings').addEventListener('click', () => {
       openModal('settings-modal');
     });
 
     // Expense add
+
     document.getElementById('expense-add').addEventListener('click', addExpense);
 
     // Notification banner
+
     document.getElementById('btn-allow-notify').addEventListener('click', requestNotificationPermission);
     document.getElementById('btn-dismiss-notify').addEventListener('click', () => {
       document.getElementById('notification-banner').classList.add('hidden');
@@ -1222,6 +1450,7 @@
   }
 
   // ==================== PWA Install ====================
+
   function initPWAInstall() {
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
@@ -1245,6 +1474,7 @@
   }
 
   // ==================== Service Worker ====================
+
   function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js').then(reg => {
@@ -1256,6 +1486,7 @@
   }
 
   // ==================== Spot Editor ====================
+
   function openSpotEditor(existingSpot) {
     const form = document.getElementById('spot-editor-form');
     const title = document.getElementById('spot-editor-title');
@@ -1321,6 +1552,7 @@
 
     if (id) {
       // Edit existing
+
       const idx = day.spots.findIndex(s => s.id === id);
       if (idx >= 0) {
         spotData.nearby = day.spots[idx].nearby;
@@ -1328,6 +1560,7 @@
       }
     } else {
       // Add new
+
       day.spots.push(spotData);
     }
 
@@ -1348,6 +1581,7 @@
     day.spots.splice(idx, 1);
 
     // Clear stale transport on new last spot
+
     if (day.spots.length > 0 && idx === day.spots.length) {
       day.spots[day.spots.length - 1].transportToNext = null;
     }
@@ -1364,6 +1598,7 @@
   }
 
   // ==================== Day Management ====================
+
   function addDay() {
     const lastDay = state.itinerary[state.itinerary.length - 1];
     const lastDate = lastDay ? new Date(lastDay.date + 'T00:00:00') : new Date();
@@ -1388,9 +1623,11 @@
     state.itinerary.splice(dayIdx, 1);
 
     // Renumber
+
     state.itinerary.forEach((d, i) => { d.day = i + 1; });
 
     // Clamp current day
+
     if (state.currentDay >= state.itinerary.length) {
       state.currentDay = state.itinerary.length - 1;
     }
@@ -1404,6 +1641,7 @@
   }
 
   // ==================== Map Pick ====================
+
   function startMapPick() {
     state.mapPickMode = true;
     closeModal('spot-editor-modal');
@@ -1434,6 +1672,7 @@
   }
 
   // ==================== Import / Export / Reset ====================
+
   function exportItinerary() {
     try {
       const json = JSON.stringify(state.itinerary, null, 2);
@@ -1499,18 +1738,23 @@
   }
 
   // ==================== Init Itinerary Editor ====================
+
   function initItineraryEditor() {
     // FAB
+
     document.getElementById('fab-add-spot').addEventListener('click', () => openSpotEditor(null));
 
     // Spot editor form submit
+
     document.getElementById('spot-editor-form').addEventListener('submit', handleSpotEditorSubmit);
 
     // Map pick
+
     document.getElementById('btn-map-pick').addEventListener('click', startMapPick);
     document.getElementById('btn-cancel-pick').addEventListener('click', cancelMapPick);
 
     // Import / Export / Reset / GitHub reload
+
     document.getElementById('btn-export').addEventListener('click', exportItinerary);
     document.getElementById('btn-import').addEventListener('click', importItinerary);
     document.getElementById('import-file').addEventListener('change', handleImportFile);
@@ -1519,9 +1763,17 @@
       if (!confirm('確定要從 GitHub 重新載入行程嗎？會覆蓋目前資料。')) return;
       reloadFromGitHub();
     });
+
+    document.getElementById('btn-clear-storage').addEventListener('click', () => {
+      if (!confirm('⚠️ 確定要清空所有本機資料嗎？\n\n這會清除：行程、記帳紀錄、行前清單、照片、天氣快取等所有資料。\n\n此操作無法復原！')) return;
+      localStorage.clear();
+      alert('✅ 已清空所有 localStorage 資料，頁面即將重新載入。');
+      location.reload();
+    });
   }
 
   // ==================== Utilities ====================
+
   function calcDistance(lat1, lon1, lat2, lon2) {
     const R = 6371;
     const dLat = deg2rad(lat2 - lat1);
@@ -1534,6 +1786,7 @@
   function deg2rad(deg) { return deg * (Math.PI / 180); }
 
   // ==================== Travel Tools ====================
+
   const PHRASES_DATA = [
     { cat: '👋 基本招呼', items: [
       { jp: 'こんにちは', roman: 'Konnichiwa', zh: '你好' },
@@ -1593,11 +1846,13 @@
 
   function initTravelTools() {
     // Tools modal open
+
     document.getElementById('btn-tools').addEventListener('click', () => {
       openModal('tools-modal');
     });
 
     // Tab switching
+
     document.querySelectorAll('.tools-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.tools-tab').forEach(t => t.classList.remove('active'));
@@ -1608,9 +1863,11 @@
     });
 
     // Currency converter
+
     initCurrencyConverter();
 
     // Render phrases & emergency (static content)
+
     renderPhrases();
     renderEmergencyInfo();
   }
@@ -1635,6 +1892,7 @@
     });
 
     // Quick chips
+
     document.querySelectorAll('.currency-quick-chips .chip').forEach(chip => {
       chip.addEventListener('click', () => {
         const jpy = parseInt(chip.dataset.jpy, 10);
@@ -1644,6 +1902,7 @@
     });
 
     // Update rate from API
+
     document.getElementById('btn-update-rate').addEventListener('click', async () => {
       const btn = document.getElementById('btn-update-rate');
       btn.textContent = '⏳ 查詢中...';
@@ -1656,6 +1915,7 @@
           localStorage.setItem('okinawa_currency_rate', state.currencyRate.toString());
           updateRateDisplay();
           // Re-calc if there's a value
+
           if (jpyInput.value) {
             twdInput.value = Math.round(parseFloat(jpyInput.value) * state.currencyRate);
           }
@@ -1692,6 +1952,7 @@
     `).join('');
 
     // TTS speak buttons
+
     container.querySelectorAll('.phrase-speak-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         if ('speechSynthesis' in window) {
@@ -1742,6 +2003,11 @@
     registerServiceWorker();
     startWatchingPosition();
     getCurrentPosition();
+
+    // Fetch weather data in background
+    updateWeatherData().then(updated => {
+      if (updated) console.log('Weather data updated from API');
+    });
   }
 
   // Start when DOM is ready

@@ -1,288 +1,347 @@
 // ==============================
-// 沖繩 7 天 6 夜行程資料
+
+// 沖繩 6 天 5 夜行程資料
+
 // ==============================
+
 
 const APP_DATA = {
   center: [26.3344, 127.7731],
   defaultZoom: 11,
 
-  // ---------- 7 天行程 ----------
+  // ---------- 6 天行程 ----------
+
   itinerary: [
     {
       day: 1,
-      date: '2026-04-22',
-      title: 'Day 1 — 那霸市區漫步',
-      weather: { icon: '☀️', temp: '26°C', desc: '晴天', humidity: '65%', wind: '東南風 3m/s' },
+      date: '2026-06-26',
+      title: 'Day 1 — 抵達沖繩 & 國際通',
+      weather: { icon: '⛅', temp: '--°C', desc: '待更新', humidity: '--', wind: '--' },
       spots: [
         {
           id: 'd1s1', name: '那霸機場', lat: 26.2058, lng: 127.6460,
-          time: '10:00', duration: 30,
-          description: '抵達沖繩！領取行李、換日幣、購買 OKA 單軌一日券',
-          transportToNext: { mode: 'monorail', duration: 15, note: '搭單軌到縣廳前站', color: '#e74c3c' },
-          tips: '建議在機場先買好單軌電車一日券 (800 JPY)',
+          time: '15:45', duration: 60,
+          description: '抵達沖繩！領取行李後前往租車處',
+          transportToNext: { mode: 'car', duration: 10, note: '搭接駁車前往租車點', color: '#3498db' },
+          tips: '建議在機場先換好日幣、買好飲料',
+          nearby: [
+            { name: '空港食堂', lat: 26.2060, lng: 127.6465, type: 'restaurant', cuisine: '🍜 沖繩麵', price: '¥750' },
+            { name: 'A&W 那霸空港店', lat: 26.2062, lng: 127.6458, type: 'restaurant', cuisine: '🍔 美式速食', price: '¥700' },
+            { name: 'ポークたまごおにぎり本店 空港1F店', lat: 26.2056, lng: 127.6462, type: 'restaurant', cuisine: '🍙 飯糰', price: '¥350' }
+          ]
+        },
+        {
+          id: 'd1s2', name: '沖繩行腳租車', lat: 26.2095, lng: 127.6505,
+          time: '16:55', duration: 60,
+          description: '沖繩行脚レンタカー，辦理租車手續、取車',
+          transportToNext: { mode: 'car', duration: 12, note: '開車前往飯店', color: '#3498db' },
+          tips: '記得確認兒童座椅、GPS 導航設定',
           nearby: []
         },
         {
-          id: 'd1s2', name: '國際通', lat: 26.2154, lng: 127.6847,
-          time: '11:00', duration: 120,
+          id: 'd1s3', name: 'HOTEL NAHA CITY', lat: 26.2155, lng: 127.6847,
+          time: '18:07', duration: 60,
+          description: '位於國際通上的便利飯店，Check-in 後放行李',
+          transportToNext: { mode: 'walk', duration: 3, note: '步行前往國際通', color: '#f39c12' },
+          tips: '飯店就在國際通旁邊，逛街非常方便',
+          nearby: []
+        },
+        {
+          id: 'd1s4', name: '國際通 (Kokusai-dori)', lat: 26.2154, lng: 127.6847,
+          time: '19:10', duration: 60,
           description: '沖繩最熱鬧的商店街，約 1.6 公里長，伴手禮、美食一次買齊',
-          transportToNext: { mode: 'walk', duration: 5, note: '步行前往', color: '#f39c12' },
-          tips: '週日下午有步行者天國（交通管制）',
+          transportToNext: null,
+          tips: '晚上可以先逛逛熟悉環境，週日有步行者天國',
           nearby: [
             { name: '暖暮拉麵 國際通店', lat: 26.2148, lng: 127.6855, type: 'restaurant', cuisine: '🍜 拉麵', price: '¥900' },
             { name: "Jack's Steak House", lat: 26.2133, lng: 127.6788, type: 'restaurant', cuisine: '🥩 牛排', price: '¥1500' },
             { name: '花笠食堂', lat: 26.2143, lng: 127.6862, type: 'restaurant', cuisine: '🍱 沖繩料理', price: '¥800' },
+            { name: 'ステーキハウス88 國際通店', lat: 26.2152, lng: 127.6838, type: 'restaurant', cuisine: '🥩 牛排', price: '¥2000' },
+            { name: '鹽屋 國際通店', lat: 26.2156, lng: 127.6850, type: 'restaurant', cuisine: '🍦 冰淇淋', price: '¥400' },
             { name: 'FamilyMart 國際通', lat: 26.2158, lng: 127.6840, type: 'convenience' }
-          ]
-        },
-        {
-          id: 'd1s3', name: '第一牧志公設市場', lat: 26.2142, lng: 127.6868,
-          time: '13:30', duration: 90,
-          description: '沖繩的廚房！一樓買海鮮，二樓代料理，新鮮又實惠',
-          transportToNext: { mode: 'monorail', duration: 20, note: '步行至旭橋站，搭單軌到波上宮', color: '#e74c3c' },
-          tips: '二樓代料理費約 ¥500/人',
-          nearby: [
-            { name: '牧志天婦羅店', lat: 26.2140, lng: 127.6872, type: 'restaurant', cuisine: '🍤 天婦羅', price: '¥100/個' }
-          ]
-        },
-        {
-          id: 'd1s4', name: '波上宮', lat: 26.2178, lng: 127.6668,
-          time: '16:00', duration: 60,
-          description: '建在懸崖上的琉球八社之首，可順遊波之上海灘',
-          transportToNext: null,
-          tips: '傍晚時分拍照最美，旁邊有波之上海灘',
-          nearby: [
-            { name: 'Lawson 若狹', lat: 26.2175, lng: 127.6680, type: 'convenience' }
           ]
         }
       ]
     },
     {
       day: 2,
-      date: '2026-04-23',
-      title: 'Day 2 — 中部美國風情',
-      weather: { icon: '⛅', temp: '25°C', desc: '多雲時晴', humidity: '70%', wind: '東風 4m/s' },
+      date: '2026-06-27',
+      title: 'Day 2 — 那霸文化探索',
+      weather: { icon: '🌤️', temp: '--°C', desc: '待更新', humidity: '--', wind: '--' },
       spots: [
         {
-          id: 'd2s1', name: '美國村', lat: 26.3275, lng: 127.7656,
-          time: '09:30', duration: 180,
-          description: '充滿美式風情的複合商圈，摩天輪、海灘、購物一次滿足',
-          transportToNext: { mode: 'car', duration: 30, note: '開車走 58 號國道北上', color: '#3498db' },
-          tips: '日落海灘看夕陽非常美，建議傍晚再來一次',
+          id: 'd2s1', name: '泊港漁市場', lat: 26.2250, lng: 127.6770,
+          time: '08:10', duration: 60,
+          description: '這座海鮮市集每到早上即會充滿活力，有許多批發攤商販售新鮮的當地現捕海鮮',
+          transportToNext: { mode: 'car', duration: 8, note: '開車前往波上宮', color: '#3498db' },
+          tips: '建議一早來，海鮮最新鮮！可以現買現吃',
           nearby: [
-            { name: 'Benson\'s 漢堡', lat: 26.3269, lng: 127.7649, type: 'restaurant', cuisine: '🍔 漢堡', price: '¥1200' },
-            { name: 'グルメ回転寿司', lat: 26.3282, lng: 127.7661, type: 'restaurant', cuisine: '🍣 迴轉壽司', price: '¥1500' },
-            { name: 'Lawson 美國村', lat: 26.3270, lng: 127.7645, type: 'convenience' }
+            { name: '泊漁港食堂', lat: 26.2248, lng: 127.6775, type: 'restaurant', cuisine: '🐟 海鮮丼', price: '¥1000' },
+            { name: '泊いゆまち 鮮魚直賣', lat: 26.2252, lng: 127.6768, type: 'restaurant', cuisine: '🍣 生魚片', price: '¥800' },
+            { name: '海鮮天婦羅攤', lat: 26.2249, lng: 127.6772, type: 'restaurant', cuisine: '🍤 天婦羅', price: '¥500' }
           ]
         },
         {
-          id: 'd2s2', name: '殘波岬', lat: 26.4425, lng: 127.7131,
-          time: '13:30', duration: 60,
-          description: '高 30m 的斷崖絕壁與白色燈塔，壯觀的海岸線',
-          transportToNext: { mode: 'car', duration: 15, note: '開車前往', color: '#3498db' },
-          tips: '燈塔入場 ¥300，可登頂遠眺',
+          id: 'd2s2', name: '波上宮', lat: 26.2178, lng: 127.6668,
+          time: '09:18', duration: 120,
+          description: '這座神社建於 1890 年，是慶典的舉辦地點，可自懸崖上觀賞風景',
+          transportToNext: { mode: 'car', duration: 12, note: '開車前往牧志公設市場', color: '#3498db' },
+          tips: '琉球八社之首，旁邊有波之上海灘可順遊',
           nearby: [
-            { name: '殘波岬皇家飯店餐廳', lat: 26.4420, lng: 127.7140, type: 'restaurant', cuisine: '🍽️ 自助餐', price: '¥2000' }
+            { name: 'Lawson 若狹', lat: 26.2175, lng: 127.6680, type: 'convenience' },
+            { name: '波之上茶屋', lat: 26.2176, lng: 127.6672, type: 'restaurant', cuisine: '🍵 甜點', price: '¥500' }
           ]
         },
         {
-          id: 'd2s3', name: '座喜味城跡', lat: 26.4103, lng: 127.7439,
-          time: '15:30', duration: 60,
-          description: '世界遺產！保存良好的琉球城堡遺跡，免費入場',
-          transportToNext: null,
-          tips: '免費參觀，城牆上可遠眺東西海岸',
+          id: 'd2s3', name: '那霸市第一牧志公設市場', lat: 26.2142, lng: 127.6868,
+          time: '11:30', duration: 120,
+          description: '沖繩的廚房！一樓買海鮮，二樓代料理，新鮮又實惠',
+          transportToNext: { mode: 'car', duration: 12, note: '開車前往 teamLab', color: '#3498db' },
+          tips: '二樓代料理費約 ¥500/人，可以在這裡吃午餐',
           nearby: [
-            { name: '鶴龜堂拉麵', lat: 26.4098, lng: 127.7445, type: 'restaurant', cuisine: '🍜 拉麵', price: '¥850' }
+            { name: '牧志天婦羅店', lat: 26.2140, lng: 127.6872, type: 'restaurant', cuisine: '🍤 天婦羅', price: '¥100/個' },
+            { name: '松原屋製菓', lat: 26.2138, lng: 127.6865, type: 'restaurant', cuisine: '🍡 沖繩菓子', price: '¥200' },
+            { name: '壺屋やちむん通り茶屋', lat: 26.2135, lng: 127.6880, type: 'restaurant', cuisine: '🍵 茶屋', price: '¥600' }
+          ]
+        },
+        {
+          id: 'd2s4', name: 'teamLab Future Park 沖繩', lat: 26.2316, lng: 127.6920,
+          time: '13:42', duration: 150,
+          description: '互動數位藝術樂園，小朋友的天堂！光影互動超好玩',
+          transportToNext: { mode: 'walk', duration: 0, note: '同棟建築內', color: '#f39c12' },
+          tips: '適合親子同樂，建議穿淺色衣服拍照更好看',
+          nearby: [
+            { name: 'T Galleria 美食區', lat: 26.2318, lng: 127.6925, type: 'restaurant', cuisine: '🍽️ 輕食', price: '¥800' }
+          ]
+        },
+        {
+          id: 'd2s5', name: '迪斐世 沖繩那霸店 (T Galleria)', lat: 26.2316, lng: 127.6926,
+          time: '16:12', duration: 30,
+          description: '販售手提包、香水等多款免稅商品的零售連鎖店',
+          transportToNext: { mode: 'car', duration: 8, note: '開車前往 San-A', color: '#3498db' },
+          tips: '出示護照可享免稅優惠',
+          nearby: []
+        },
+        {
+          id: 'd2s6', name: 'San-A那霸Main Place', lat: 26.2325, lng: 127.6960,
+          time: '16:50', duration: 120,
+          description: '那霸大型購物中心，在商場用晚餐',
+          transportToNext: { mode: 'car', duration: 12, note: '開車回飯店', color: '#3498db' },
+          tips: '商場內有許多餐廳可選擇，適合在這裡吃晚餐',
+          nearby: [
+            { name: 'San-A 美食街', lat: 26.2328, lng: 127.6965, type: 'restaurant', cuisine: '🍽️ 美食街', price: '¥900' },
+            { name: 'やっぱりステーキ おもろまち店', lat: 26.2330, lng: 127.6958, type: 'restaurant', cuisine: '🥩 牛排', price: '¥1000' },
+            { name: 'スターバックス おもろまち', lat: 26.2322, lng: 127.6955, type: 'restaurant', cuisine: '☕ 咖啡', price: '¥500' }
           ]
         }
       ]
     },
     {
       day: 3,
-      date: '2026-04-24',
-      title: 'Day 3 — 北部自然之旅',
-      weather: { icon: '🌤️', temp: '24°C', desc: '晴時多雲', humidity: '72%', wind: '北東風 3m/s' },
+      date: '2026-06-28',
+      title: 'Day 3 — 水族館·首里城·美國村',
+      weather: { icon: '☀️', temp: '--°C', desc: '待更新', humidity: '--', wind: '--' },
       spots: [
         {
-          id: 'd3s1', name: '美麗海水族館', lat: 26.6943, lng: 127.8779,
-          time: '09:00', duration: 180,
-          description: '世界級水族館！黑潮之海大水槽有鯨鯊和鬼蝠魟',
-          transportToNext: { mode: 'car', duration: 10, note: '園區內開車', color: '#3498db' },
-          tips: '16:00 後入場有折扣。鯨鯊餵食秀 15:00 & 17:00',
+          id: 'd3s1', name: 'DMM Kariyushi水族館', lat: 26.1548, lng: 127.6558,
+          time: '09:22', duration: 60,
+          description: '展覽內容包括水母、烏龜和熱帶魚等，還有展示青蛙和變色龍的雨林區',
+          transportToNext: { mode: 'car', duration: 32, note: '開車前往首里城', color: '#3498db' },
+          tips: '位於 iias 沖繩豐崎內，適合親子同遊',
           nearby: [
-            { name: '海洋博公園餐廳', lat: 26.6940, lng: 127.8785, type: 'restaurant', cuisine: '🍱 定食', price: '¥1000' },
-            { name: 'FamilyMart 本部', lat: 26.6583, lng: 127.8843, type: 'convenience' }
+            { name: 'iias 沖繩豐崎美食街', lat: 26.1545, lng: 127.6562, type: 'restaurant', cuisine: '🍽️ 美食街', price: '¥900' },
+            { name: '丸亀製麺 iias沖繩豐崎店', lat: 26.1546, lng: 127.6555, type: 'restaurant', cuisine: '🍜 烏龍麵', price: '¥500' },
+            { name: '沖繩そば やんばる iias店', lat: 26.1549, lng: 127.6560, type: 'restaurant', cuisine: '🍜 沖繩麵', price: '¥750' }
           ]
         },
         {
-          id: 'd3s2', name: '備瀨福木林道', lat: 26.7069, lng: 127.8756,
-          time: '12:30', duration: 60,
-          description: '被福木樹圍繞的寧靜小路，充滿沖繩原始風情',
-          transportToNext: { mode: 'car', duration: 40, note: '開車經屋我地大橋前往', color: '#3498db' },
-          tips: '可租腳踏車漫遊 (¥300/次)',
+          id: 'd3s2', name: '首里城', lat: 26.2170, lng: 127.7195,
+          time: '10:54', duration: 60,
+          description: '經過重建的山頂城堡，坐落在遼闊的園區內，是飽覽城市全景的絕佳去處',
+          transportToNext: { mode: 'car', duration: 31, note: '開車前往美國村', color: '#3498db' },
+          tips: '入場 ¥400，正在重建中的世界遺產，仍值得一訪',
           nearby: [
-            { name: '備瀨茶屋', lat: 26.7065, lng: 127.8760, type: 'restaurant', cuisine: '🍵 茶屋', price: '¥600' }
+            { name: '首里そば', lat: 26.2175, lng: 127.7190, type: 'restaurant', cuisine: '🍜 沖繩麵', price: '¥700' },
+            { name: '首里殿内', lat: 26.2168, lng: 127.7188, type: 'restaurant', cuisine: '🍱 琉球料理', price: '¥1500' },
+            { name: 'ぶくぶく茶屋', lat: 26.2172, lng: 127.7192, type: 'restaurant', cuisine: '🍵 沖繩茶', price: '¥500' }
           ]
         },
         {
-          id: 'd3s3', name: '古宇利島', lat: 26.7133, lng: 128.0250,
-          time: '14:30', duration: 120,
-          description: '「戀之島」！古宇利大橋的絕景，心型岩必訪',
+          id: 'd3s3', name: '美國村', lat: 26.3275, lng: 127.7656,
+          time: '12:25', duration: 300,
+          description: '美式風格的大型露天商場，有許多商店和餐廳進駐，並設有電影院與摩天輪',
+          transportToNext: { mode: 'car', duration: 4, note: '美國村內移動', color: '#3498db' },
+          tips: '日落海灘看夕陽非常美，摩天輪可俯瞰全景',
+          nearby: [
+            { name: "Benson's 漢堡", lat: 26.3269, lng: 127.7649, type: 'restaurant', cuisine: '🍔 漢堡', price: '¥1200' },
+            { name: 'グルメ回転寿司', lat: 26.3282, lng: 127.7661, type: 'restaurant', cuisine: '🍣 迴轉壽司', price: '¥1500' },
+            { name: 'タコライスcafe きじむなぁ', lat: 26.3278, lng: 127.7652, type: 'restaurant', cuisine: '🌮 塔可飯', price: '¥800' },
+            { name: 'Blue Seal 美浜店', lat: 26.3272, lng: 127.7655, type: 'restaurant', cuisine: '🍦 冰淇淋', price: '¥400' },
+            { name: 'Lawson 美國村', lat: 26.3270, lng: 127.7645, type: 'convenience' }
+          ]
+        },
+        {
+          id: 'd3s4', name: '琉球之牛 北谷店 (美國村)', lat: 26.3269, lng: 127.7650,
+          time: '17:29', duration: 60,
+          description: '人氣燒肉名店！使用沖繩縣產和牛，必吃的燒肉體驗',
+          transportToNext: { mode: 'car', duration: 6, note: '開車前往飯店', color: '#3498db' },
+          tips: '建議事先預約，非常熱門的餐廳',
+          nearby: []
+        },
+        {
+          id: 'd3s5', name: '沖繩坎帕納船舶飯店 (VESSEL HOTEL)', lat: 26.3260, lng: 127.7640,
+          time: '18:35', duration: 60,
+          description: '北谷地區的海景飯店，Check-in 休息',
           transportToNext: null,
-          tips: '心型岩在 Tinu 海灘，從停車場步行 5 分鐘',
-          nearby: [
-            { name: '蝦蝦飯 Shrimp Wagon', lat: 26.7130, lng: 128.0245, type: 'restaurant', cuisine: '🦐 蝦飯', price: '¥1000' },
-            { name: '花人逢', lat: 26.6298, lng: 127.8627, type: 'restaurant', cuisine: '🍕 披薩', price: '¥1200' }
-          ]
+          tips: '飯店有免費大浴場，可以泡湯放鬆',
+          nearby: []
         }
       ]
     },
     {
       day: 4,
-      date: '2026-04-25',
-      title: 'Day 4 — 中部海岸探索',
-      weather: { icon: '🌧️', temp: '23°C', desc: '陣雨', humidity: '80%', wind: '南風 5m/s' },
+      date: '2026-06-29',
+      title: 'Day 4 — 美麗海水族館·古宇利島',
+      weather: { icon: '⛅', temp: '--°C', desc: '待更新', humidity: '--', wind: '--' },
       spots: [
         {
-          id: 'd4s1', name: '萬座毛', lat: 26.5044, lng: 127.8528,
-          time: '09:30', duration: 60,
-          description: '象鼻岩！沖繩代表性的斷崖絕景，可容萬人座的草原',
-          transportToNext: { mode: 'car', duration: 20, note: '開車南下', color: '#3498db' },
-          tips: '入場 ¥100。雨天路滑注意安全',
+          id: 'd4s1', name: '沖繩美麗海水族館', lat: 26.6943, lng: 127.8779,
+          time: '08:29', duration: 210,
+          description: '世界上最大的水族館，有鯊魚、珊瑚、魚、鬼蝠缸等動物',
+          transportToNext: { mode: 'car', duration: 17, note: '開車前往岸本食堂', color: '#3498db' },
+          tips: '黑潮之海大水槽必看！鯨鯊餵食秀 15:00 & 17:00',
           nearby: [
-            { name: 'ANA萬座海灘度假村餐廳', lat: 26.5040, lng: 127.8540, type: 'restaurant', cuisine: '🍽️ 西式', price: '¥2500' }
+            { name: '海洋博公園餐廳', lat: 26.6940, lng: 127.8785, type: 'restaurant', cuisine: '🍱 定食', price: '¥1000' },
+            { name: 'オーシャンブルー (Ocean Blue)', lat: 26.6942, lng: 127.8782, type: 'restaurant', cuisine: '☕ 水槽景觀咖啡', price: '¥700' },
+            { name: 'FamilyMart 本部', lat: 26.6583, lng: 127.8843, type: 'convenience' }
           ]
         },
         {
-          id: 'd4s2', name: '琉球村', lat: 26.4564, lng: 127.7678,
-          time: '11:30', duration: 120,
-          description: '體驗琉球傳統文化！三線琴體驗、傳統服裝、EISA太鼓',
-          transportToNext: { mode: 'car', duration: 10, note: '開車前往', color: '#3498db' },
-          tips: '入場 ¥2000。三線琴體驗 ¥500。雨天室內活動多',
+          id: 'd4s2', name: '岸本食堂 八重岳店', lat: 26.6490, lng: 127.8900,
+          time: '12:16', duration: 90,
+          description: 'きしもと食堂，沖繩麵名店！傳統手打麵條，湯頭濃郁',
+          transportToNext: { mode: 'car', duration: 26, note: '開車經屋我地大橋前往古宇利', color: '#3498db' },
+          tips: '必吃沖繩そば，是本部町的老字號名店',
+          nearby: []
+        },
+        {
+          id: 'd4s3', name: '古宇利海洋塔', lat: 26.7050, lng: 128.0130,
+          time: '14:12', duration: 90,
+          description: '坐擁可遍覽遼闊海景的室內外觀景台，乘坐高爾夫球車穿越花園即可到達',
+          transportToNext: { mode: 'car', duration: 4, note: '島內開車', color: '#3498db' },
+          tips: '可搭乘自動駕駛高爾夫球車上塔，海景絕美',
           nearby: [
-            { name: '琉球村園內食堂', lat: 26.4560, lng: 127.7680, type: 'restaurant', cuisine: '🍱 沖繩料理', price: '¥900' }
+            { name: '古宇利島 Ocean Tower Cafe', lat: 26.7048, lng: 128.0135, type: 'restaurant', cuisine: '☕ 海景咖啡', price: '¥600' }
           ]
         },
         {
-          id: 'd4s3', name: '真榮田岬（青之洞窟）', lat: 26.4389, lng: 127.7672,
-          time: '14:30', duration: 120,
-          description: '著名的浮潛/潛水聖地，洞窟內藍光夢幻',
+          id: 'd4s4', name: '古宇利蝦蝦飯', lat: 26.7130, lng: 128.0245,
+          time: '15:46', duration: 30,
+          description: '受歡迎的海濱餐廳，供應夏威夷風味的美食小吃，例如蒜蓉蝦佐牛肉和辣薯條',
+          transportToNext: { mode: 'car', duration: 70, note: '開車南下前往永旺夢樂城', color: '#3498db' },
+          tips: '份量十足的蒜蓉蝦飯，古宇利島必吃美食',
+          nearby: [
+            { name: 'YOSHIKA (古宇利島冰淇淋)', lat: 26.7128, lng: 128.0248, type: 'restaurant', cuisine: '🍦 冰淇淋', price: '¥350' }
+          ]
+        },
+        {
+          id: 'd4s5', name: '永旺夢樂城 沖繩來客夢', lat: 26.3344, lng: 127.7731,
+          time: '17:26', duration: 180,
+          description: '沖繩最大購物中心！250+ 店鋪，逛街購物吃晚餐',
           transportToNext: null,
-          tips: '浮潛體驗約 ¥3000-5000。需預約。雨天可能取消',
+          tips: '退稅櫃檯在 1F，免稅金額 ¥5000 以上',
           nearby: [
-            { name: 'FamilyMart 恩納', lat: 26.4395, lng: 127.7680, type: 'convenience' }
+            { name: 'フードコート', lat: 26.3340, lng: 127.7735, type: 'restaurant', cuisine: '🍽️ 美食街', price: '¥800' },
+            { name: 'A&W 漢堡', lat: 26.3348, lng: 127.7728, type: 'restaurant', cuisine: '🍔 美式速食', price: '¥700' },
+            { name: 'サーティワン (31冰淇淋)', lat: 26.3342, lng: 127.7732, type: 'restaurant', cuisine: '🍦 冰淇淋', price: '¥400' },
+            { name: '丸亀製麺 ライカム店', lat: 26.3346, lng: 127.7738, type: 'restaurant', cuisine: '🍜 烏龍麵', price: '¥500' }
           ]
         }
       ]
     },
     {
       day: 5,
-      date: '2026-04-26',
-      title: 'Day 5 — 南部文化巡禮',
-      weather: { icon: '⛅', temp: '25°C', desc: '多雲', humidity: '68%', wind: '東風 3m/s' },
+      date: '2026-06-30',
+      title: 'Day 5 — 親子購物·殘波岬度假',
+      weather: { icon: '🌤️', temp: '--°C', desc: '待更新', humidity: '--', wind: '--' },
       spots: [
         {
-          id: 'd5s1', name: '齋場御嶽', lat: 26.1772, lng: 127.8278,
-          time: '09:00', duration: 60,
-          description: '琉球王國最高聖地，世界遺產，三角岩隙間可望久高島',
-          transportToNext: { mode: 'car', duration: 5, note: '開車前往', color: '#3498db' },
-          tips: '入場 ¥300。需脫帽，保持肅靜',
-          nearby: []
-        },
-        {
-          id: 'd5s2', name: '知念岬公園', lat: 26.1744, lng: 127.8331,
-          time: '10:30', duration: 45,
-          description: '太平洋全景觀景台，可遠望久高島與 Komaka 島',
-          transportToNext: { mode: 'car', duration: 15, note: '沿海岸線開車', color: '#3498db' },
-          tips: '免費。拍照的好地方',
+          id: 'd5s1', name: 'Birthday港川店', lat: 26.2950, lng: 127.7480,
+          time: '08:24', duration: 60,
+          description: '日本知名嬰幼兒用品店，種類齊全價格實惠，親子必逛',
+          transportToNext: { mode: 'car', duration: 16, note: '開車前往西松屋', color: '#3498db' },
+          tips: '嬰幼兒服飾、玩具、用品應有盡有',
           nearby: [
-            { name: 'Cafe くるくま', lat: 26.1533, lng: 127.8131, type: 'restaurant', cuisine: '🍛 南洋料理', price: '¥1200' }
+            { name: '港川外人住宅街 oHacorte', lat: 26.2945, lng: 127.7485, type: 'restaurant', cuisine: '🍰 水果塔', price: '¥600' },
+            { name: '港川外人住宅街 ippe coppe', lat: 26.2948, lng: 127.7478, type: 'restaurant', cuisine: '🍞 天然酵母麵包', price: '¥400' }
           ]
         },
         {
-          id: 'd5s3', name: 'NIRAIKANAI橋', lat: 26.1547, lng: 127.7928,
-          time: '12:00', duration: 30,
-          description: '壯觀的U字型大橋，從山上直通海邊，沖繩最美公路',
-          transportToNext: { mode: 'car', duration: 15, note: '開車前往', color: '#3498db' },
-          tips: '橋上不能停車！建議從上方展望台拍照',
+          id: 'd5s2', name: '西松屋 北谷美浜店', lat: 26.3260, lng: 127.7640,
+          time: '09:40', duration: 60,
+          description: '日本平價嬰幼兒用品連鎖店，童裝超便宜',
+          transportToNext: { mode: 'walk', duration: 6, note: '步行前往壽司店', color: '#f39c12' },
+          tips: '童裝價格非常親民，可以多買一些',
           nearby: []
         },
         {
-          id: 'd5s4', name: '沖繩世界（玉泉洞）', lat: 26.1411, lng: 127.7472,
-          time: '13:00', duration: 150,
-          description: '30 萬年鐘乳石洞 + 琉球王國城下町，體驗傳統工藝',
+          id: 'd5s3', name: '迴轉壽司市場 美浜店', lat: 26.3280, lng: 127.7660,
+          time: '10:46', duration: 60,
+          description: '沖繩在地迴轉壽司，新鮮實惠的午餐好選擇',
+          transportToNext: { mode: 'car', duration: 37, note: '開車前往殘波岬', color: '#3498db' },
+          tips: '沖繩當地海鮮壽司必點，價格實惠',
+          nearby: []
+        },
+        {
+          id: 'd5s4', name: '沖繩殘波岬美爵度假酒店', lat: 26.4420, lng: 127.7130,
+          time: '12:23', duration: 720,
+          description: '殘波岬旁的度假酒店，享受飯店設施和海景，悠閒度假',
           transportToNext: null,
-          tips: '入場 ¥2000。洞窟內涼爽，帶件薄外套',
+          tips: '飯店有泳池和海灘，可帶小朋友玩水放鬆。旁邊就是殘波岬燈塔',
           nearby: [
-            { name: '沖繩世界園內餐廳', lat: 26.1415, lng: 127.7478, type: 'restaurant', cuisine: '🍱 沖繩麵', price: '¥850' },
-            { name: '浜辺の茶屋', lat: 26.1556, lng: 127.7900, type: 'restaurant', cuisine: '☕ 海景咖啡', price: '¥800' }
+            { name: '殘波岬燈塔', lat: 26.4425, lng: 127.7131, type: 'attraction', cuisine: '🏮 景點' },
+            { name: '飯店餐廳', lat: 26.4418, lng: 127.7140, type: 'restaurant', cuisine: '🍽️ 自助餐', price: '¥2000' },
+            { name: '花織そば', lat: 26.4415, lng: 127.7125, type: 'restaurant', cuisine: '🍜 沖繩麵', price: '¥800' }
           ]
         }
       ]
     },
     {
       day: 6,
-      date: '2026-04-27',
-      title: 'Day 6 — 那霸歷史與海景',
-      weather: { icon: '☀️', temp: '27°C', desc: '晴天', humidity: '60%', wind: '南風 2m/s' },
+      date: '2026-07-01',
+      title: 'Day 6 — Outlet 購物·歸程',
+      weather: { icon: '☀️', temp: '--°C', desc: '待更新', humidity: '--', wind: '--' },
       spots: [
         {
-          id: 'd6s1', name: '首里城', lat: 26.2170, lng: 127.7195,
-          time: '09:00', duration: 120,
-          description: '琉球王國的象徵！世界遺產，正在重建中的朱紅宮殿',
-          transportToNext: { mode: 'walk', duration: 10, note: '步行下坡', color: '#f39c12' },
-          tips: '入場 ¥400。有免費導覽（需預約）',
+          id: 'd6s1', name: '沖繩 ASHIBINAA Outlet', lat: 26.1580, lng: 127.6510,
+          time: '12:04', duration: 120,
+          description: '沖繩唯一的 Outlet Mall，國際精品折扣，最後的購物衝刺',
+          transportToNext: { mode: 'car', duration: 2, note: '開車前往還車點', color: '#3498db' },
+          tips: '距離機場很近，適合最後一天購物。記得辦理退稅',
           nearby: [
-            { name: '首里そば', lat: 26.2175, lng: 127.7190, type: 'restaurant', cuisine: '🍜 沖繩麵', price: '¥700' }
+            { name: 'Outlet 美食街', lat: 26.1578, lng: 127.6515, type: 'restaurant', cuisine: '🍽️ 美食街', price: '¥900' },
+            { name: '沖繩そば やんばる Outlet店', lat: 26.1582, lng: 127.6508, type: 'restaurant', cuisine: '🍜 沖繩麵', price: '¥750' },
+            { name: 'Blue Seal ASHIBINAA店', lat: 26.1576, lng: 127.6512, type: 'restaurant', cuisine: '🍦 冰淇淋', price: '¥400' }
           ]
         },
         {
-          id: 'd6s2', name: '金城町石疊道', lat: 26.2131, lng: 127.7178,
-          time: '11:30', duration: 45,
-          description: '琉球王國時代的古石板路，保存良好的歷史散步道',
-          transportToNext: { mode: 'car', duration: 25, note: '開車經國道 331 號南下', color: '#3498db' },
-          tips: '免費散步。石板路可能濕滑，穿好走的鞋',
+          id: 'd6s2', name: 'OTS臨空豐崎營業所', lat: 26.1550, lng: 127.6490,
+          time: '14:06', duration: 20,
+          description: '歸還租車，辦理還車手續後搭接駁車前往機場',
+          transportToNext: { mode: 'car', duration: 13, note: '搭接駁車前往機場', color: '#3498db' },
+          tips: '記得加滿油再還車，檢查車內有無遺忘物品',
           nearby: []
         },
         {
-          id: 'd6s3', name: '瀨長島 Umikaji Terrace', lat: 26.1642, lng: 127.6414,
-          time: '13:00', duration: 180,
-          description: '白色地中海風格的商業設施，面海的絕美夕陽景點',
+          id: 'd6s3', name: '那霸機場', lat: 26.2058, lng: 127.6460,
+          time: '14:39', duration: 60,
+          description: '回程！記得提早到機場，最後在機場買伴手禮',
           transportToNext: null,
-          tips: '傍晚看飛機起降+夕陽是最佳時機',
+          tips: '國內線航廈有不錯的沖繩麵店和伴手禮店，紫薯塔是必買伴手禮',
           nearby: [
-            { name: '幸せのパンケーキ', lat: 26.1640, lng: 127.6418, type: 'restaurant', cuisine: '🥞 鬆餅', price: '¥1200' },
-            { name: 'HAMMOCK CAFE', lat: 26.1644, lng: 127.6410, type: 'restaurant', cuisine: '☕ 咖啡', price: '¥800' },
-            { name: 'FamilyMart 瀨長', lat: 26.1650, lng: 127.6420, type: 'convenience' }
-          ]
-        }
-      ]
-    },
-    {
-      day: 7,
-      date: '2026-04-28',
-      title: 'Day 7 — 購物與歸程',
-      weather: { icon: '🌤️', temp: '26°C', desc: '晴時多雲', humidity: '65%', wind: '東風 3m/s' },
-      spots: [
-        {
-          id: 'd7s1', name: '永旺夢樂城沖繩來客夢', lat: 26.3344, lng: 127.7731,
-          time: '09:00', duration: 180,
-          description: '沖繩最大購物中心！250+ 店鋪，最後的購物衝刺',
-          transportToNext: { mode: 'car', duration: 40, note: '開車走高速公路回機場', color: '#3498db' },
-          tips: '退稅櫃檯在 1F。免稅金額 ¥5000 以上',
-          nearby: [
-            { name: 'フードコート', lat: 26.3340, lng: 127.7735, type: 'restaurant', cuisine: '🍽️ 美食街', price: '¥800' },
-            { name: 'A&W 漢堡', lat: 26.3348, lng: 127.7728, type: 'restaurant', cuisine: '🍔 美式速食', price: '¥700' }
-          ]
-        },
-        {
-          id: 'd7s2', name: '那霸機場', lat: 26.2058, lng: 127.6460,
-          time: '14:00', duration: 120,
-          description: '回程！記得提早 2 小時到機場，最後在國內線吃沖繩麵',
-          transportToNext: null,
-          tips: '國內線航廈有不錯的沖繩麵店和伴手禮店',
-          nearby: [
-            { name: '空港食堂', lat: 26.2060, lng: 127.6465, type: 'restaurant', cuisine: '🍜 沖繩麵', price: '¥750' }
+            { name: '空港食堂', lat: 26.2060, lng: 127.6465, type: 'restaurant', cuisine: '🍜 沖繩麵', price: '¥750' },
+            { name: 'A&W 那霸空港店', lat: 26.2062, lng: 127.6458, type: 'restaurant', cuisine: '🍔 美式速食', price: '¥700' },
+            { name: 'ポークたまごおにぎり本店 空港1F店', lat: 26.2056, lng: 127.6462, type: 'restaurant', cuisine: '🍙 飯糰', price: '¥350' }
           ]
         }
       ]
@@ -290,6 +349,7 @@ const APP_DATA = {
   ],
 
   // ---------- 行前清單 ----------
+
   checklist: [
     { id: 'ck01', category: '證件', name: '護照（效期 6 個月以上）', checked: false },
     { id: 'ck02', category: '證件', name: '機票（電子機票截圖）', checked: false },
@@ -303,7 +363,7 @@ const APP_DATA = {
     { id: 'ck10', category: '3C', name: 'WiFi 機 / SIM 卡', checked: false },
     { id: 'ck11', category: '3C', name: '相機 & 記憶卡', checked: false },
     { id: 'ck12', category: '3C', name: '萬用轉接頭', checked: false },
-    { id: 'ck13', category: '衣物', name: '換洗衣物 (7 天份)', checked: false },
+    { id: 'ck13', category: '衣物', name: '換洗衣物 (6 天份)', checked: false },
     { id: 'ck14', category: '衣物', name: '泳衣 / 泳褲', checked: false },
     { id: 'ck15', category: '衣物', name: '拖鞋 / 涼鞋', checked: false },
     { id: 'ck16', category: '衣物', name: '薄外套（冷氣房用）', checked: false },
@@ -318,6 +378,7 @@ const APP_DATA = {
   ],
 
   // ---------- 交通圖示 ----------
+
   transportIcons: {
     car: '🚗',
     monorail: '🚝',
@@ -327,6 +388,7 @@ const APP_DATA = {
   },
 
   // ---------- 費用類別 ----------
+
   expenseCategories: {
     food: '🍜 餐飲',
     transport: '🚗 交通',
