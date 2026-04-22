@@ -6,6 +6,9 @@
   'use strict';
 
   // ==================== State ====================
+  const STORAGE_KEY = 'okinawa_itinerary';
+  const GITHUB_ITINERARY_URL = 'https://bingfenghung.github.io/okinawa-travel-pwa/data/itinerary.json';
+
   const state = {
     map: null,
     currentDay: 0,
@@ -18,9 +21,118 @@
     watchId: null,
     notifyTimers: [],
     deferredInstallPrompt: null,
-    itinerary: JSON.parse(JSON.stringify(APP_DATA.itinerary)),
-    darkMode: localStorage.getItem('darkMode') === 'true'
+    itinerary: loadItinerarySync(),
+    darkMode: localStorage.getItem('darkMode') === 'true',
+    mapPickMode: false
   };
+
+  // ==================== Data Persistence ====================
+  // Synchronous load from localStorage (used at startup)
+  function loadItinerarySync() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return normalizeItinerary(parsed);
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to load itinerary:', e);
+    }
+    return JSON.parse(JSON.stringify(APP_DATA.itinerary));
+  }
+
+  // First-visit: fetch from GitHub if no localStorage data exists
+  async function loadItineraryFromGitHub() {
+    if (localStorage.getItem(STORAGE_KEY)) return false;
+    try {
+      const res = await fetch(GITHUB_ITINERARY_URL, { cache: 'no-cache' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (!Array.isArray(data) || data.length === 0) throw new Error('Invalid format');
+      state.itinerary = normalizeItinerary(data);
+      saveItinerary();
+      return true;
+    } catch (e) {
+      console.warn('Failed to fetch itinerary from GitHub:', e);
+      return false;
+    }
+  }
+
+  // Force reload from GitHub (user-triggered)
+  async function reloadFromGitHub() {
+    const btn = document.getElementById('btn-reload-github');
+    const originalText = btn.textContent;
+    btn.textContent = '⏳ 載入中...';
+    btn.disabled = true;
+    try {
+      const res = await fetch(GITHUB_ITINERARY_URL, { cache: 'no-cache' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (!Array.isArray(data) || data.length === 0) throw new Error('Invalid format');
+      state.itinerary = normalizeItinerary(data);
+      state.currentDay = 0;
+      state.currentSpot = null;
+      saveItinerary();
+      renderDayTabs();
+      renderSpotList();
+      showDayOnMap();
+      scheduleNotifications();
+      closeModal('settings-modal');
+      alert('✅ 已從 GitHub 重新載入行程！');
+    } catch (e) {
+      alert('❌ 載入失敗：' + e.message + '\n請確認網路連線或 GitHub 上有行程檔案。');
+    } finally {
+      btn.textContent = originalText;
+      btn.disabled = false;
+    }
+  }
+
+  function saveItinerary() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.itinerary));
+    } catch (e) {
+      console.warn('Failed to save itinerary:', e);
+      alert('儲存失敗，可能是儲存空間不足。建議匯出 JSON 備份。');
+    }
+  }
+
+  function normalizeItinerary(data) {
+    return data.map((day, di) => ({
+      day: day.day || di + 1,
+      date: day.date || new Date(Date.now() + di * 86400000).toISOString().slice(0, 10),
+      title: day.title || `Day ${di + 1}`,
+      weather: day.weather || { icon: '🌤️', temp: '--°C', desc: '--', humidity: '--', wind: '--' },
+      spots: Array.isArray(day.spots) ? day.spots.map(s => normalizeSpot(s)) : []
+    }));
+  }
+
+  function normalizeSpot(s) {
+    return {
+      id: s.id || generateId(),
+      name: s.name || '未命名景點',
+      lat: Number(s.lat) || 26.3344,
+      lng: Number(s.lng) || 127.7731,
+      time: s.time || '09:00',
+      duration: Number(s.duration) || 60,
+      description: s.description || '',
+      tips: s.tips || '',
+      transportToNext: s.transportToNext || null,
+      nearby: Array.isArray(s.nearby) ? s.nearby : []
+    };
+  }
+
+  function generateId() {
+    return 'sp_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+  }
+
+  // ==================== HTML Escaping ====================
+  const _escEl = document.createElement('div');
+  function esc(str) {
+    _escEl.textContent = str || '';
+    return _escEl.innerHTML;
+  }
 
   // ==================== Map Init ====================
   function initMap() {
@@ -58,13 +170,36 @@
     state.itinerary.forEach((day, i) => {
       const btn = document.createElement('button');
       btn.className = `day-tab ${i === state.currentDay ? 'active' : ''}`;
+      const deleteHtml = state.itinerary.length > 1
+        ? `<span class="day-tab-delete" data-day="${i}" title="刪除此天">✕</span>`
+        : '';
       btn.innerHTML = `
-        Day ${day.day}
-        <span class="tab-weather">${day.weather.icon} ${day.weather.temp}</span>
+        Day ${day.day} ${deleteHtml}
+        <span class="tab-weather">${esc(day.weather.icon)} ${esc(day.weather.temp)}</span>
       `;
-      btn.addEventListener('click', () => switchDay(i));
+      btn.addEventListener('click', (e) => {
+        if (e.target.closest('.day-tab-delete')) return;
+        switchDay(i);
+      });
       container.appendChild(btn);
     });
+
+    // Delete day handlers
+    container.querySelectorAll('.day-tab-delete').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const dayIdx = parseInt(el.dataset.day, 10);
+        deleteDay(dayIdx);
+      });
+    });
+
+    // Add day button
+    const addBtn = document.createElement('button');
+    addBtn.className = 'day-tab-add';
+    addBtn.textContent = '＋';
+    addBtn.title = '新增一天';
+    addBtn.addEventListener('click', addDay);
+    container.appendChild(addBtn);
   }
 
   function switchDay(dayIndex) {
@@ -81,21 +216,39 @@
     const day = state.itinerary[state.currentDay];
     if (!day) return;
 
+    const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+
     day.spots.forEach((spot, i) => {
       // Spot card
       const card = document.createElement('div');
       card.className = `spot-card ${state.currentSpot === spot.id ? 'active' : ''}`;
-      card.draggable = true;
       card.dataset.spotIndex = i;
       card.dataset.spotId = spot.id;
 
+      // Only enable drag on non-touch devices
+      if (!isTouchDevice) {
+        card.draggable = true;
+      }
+
+      const reorderHtml = isTouchDevice ? `
+        <div class="spot-reorder" style="display:flex;gap:6px;margin-left:auto;">
+          ${i > 0 ? `<button class="reorder-btn btn-move-up" data-idx="${i}">↑</button>` : ''}
+          ${i < day.spots.length - 1 ? `<button class="reorder-btn btn-move-down" data-idx="${i}">↓</button>` : ''}
+        </div>
+      ` : '';
+
       card.innerHTML = `
         <div class="spot-header">
-          <span class="spot-name">${spot.name}</span>
-          <span class="spot-time">${spot.time} · ${spot.duration}分</span>
+          <span class="spot-name">${esc(spot.name)}</span>
+          <div class="spot-edit-actions">
+            <button class="spot-edit-btn btn-edit-spot" data-spot-id="${spot.id}" title="編輯">✏️</button>
+            <button class="spot-edit-btn btn-delete-spot" data-spot-id="${spot.id}" title="刪除">🗑️</button>
+          </div>
+          ${reorderHtml}
+          <span class="spot-time">${esc(spot.time)} · ${spot.duration}分</span>
         </div>
-        <div class="spot-desc">${spot.description}</div>
-        ${spot.tips ? `<div class="spot-tips">💡 ${spot.tips}</div>` : ''}
+        <div class="spot-desc">${esc(spot.description)}</div>
+        ${spot.tips ? `<div class="spot-tips">💡 ${esc(spot.tips)}</div>` : ''}
         <div class="spot-actions">
           <button class="spot-action-btn btn-navigate" data-spot-id="${spot.id}">🧭 導航</button>
           <button class="spot-action-btn btn-nearby" data-spot-id="${spot.id}">🍜 附近美食</button>
@@ -105,16 +258,18 @@
 
       // Click to fly to spot
       card.addEventListener('click', (e) => {
-        if (e.target.closest('.spot-action-btn')) return;
+        if (e.target.closest('.spot-action-btn') || e.target.closest('.reorder-btn') || e.target.closest('.spot-edit-btn')) return;
         selectSpot(spot);
       });
 
-      // Drag & Drop
-      card.addEventListener('dragstart', onDragStart);
-      card.addEventListener('dragover', onDragOver);
-      card.addEventListener('dragleave', onDragLeave);
-      card.addEventListener('drop', onDrop);
-      card.addEventListener('dragend', onDragEnd);
+      // Drag & Drop (desktop only)
+      if (!isTouchDevice) {
+        card.addEventListener('dragstart', onDragStart);
+        card.addEventListener('dragover', onDragOver);
+        card.addEventListener('dragleave', onDragLeave);
+        card.addEventListener('drop', onDrop);
+        card.addEventListener('dragend', onDragEnd);
+      }
 
       container.appendChild(card);
 
@@ -157,6 +312,39 @@
         if (spot) capturePhoto(spot);
       });
     });
+
+    // Mobile reorder buttons
+    container.querySelectorAll('.btn-move-up, .btn-move-down').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = parseInt(btn.dataset.idx, 10);
+        const day = state.itinerary[state.currentDay];
+        const targetIdx = btn.classList.contains('btn-move-up') ? idx - 1 : idx + 1;
+        if (targetIdx < 0 || targetIdx >= day.spots.length) return;
+        const [moved] = day.spots.splice(idx, 1);
+        day.spots.splice(targetIdx, 0, moved);
+        recalcTimes(day);
+        renderSpotList();
+        showDayOnMap();
+        saveItinerary();
+      });
+    });
+
+    // Edit/Delete spot buttons
+    container.querySelectorAll('.btn-edit-spot').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const spot = findSpot(btn.dataset.spotId);
+        if (spot) openSpotEditor(spot);
+      });
+    });
+
+    container.querySelectorAll('.btn-delete-spot').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        deleteSpot(btn.dataset.spotId);
+      });
+    });
   }
 
   function findSpot(id) {
@@ -183,8 +371,8 @@
       }).addTo(state.markerLayer);
 
       marker.bindPopup(`
-        <div class="popup-title">${spot.name}</div>
-        <div class="popup-detail">${spot.time} · ${spot.duration}分鐘</div>
+        <div class="popup-title">${esc(spot.name)}</div>
+        <div class="popup-detail">${esc(spot.time)} · ${spot.duration}分鐘</div>
       `);
 
       bounds.push([spot.lat, spot.lng]);
@@ -260,8 +448,8 @@
     L.marker(to, {
       icon: createIcon('marker-spot', '🏁')
     }).addTo(state.routeLayer).bindPopup(`
-      <div class="popup-title">${toSpot.name}</div>
-      <div class="popup-detail">${toSpot.description}</div>
+      <div class="popup-title">${esc(toSpot.name)}</div>
+      <div class="popup-detail">${esc(toSpot.description)}</div>
     `);
 
     // Distance & estimated time
@@ -349,9 +537,9 @@
         .addTo(state.nearbyLayer);
 
       marker.bindPopup(`
-        <div class="popup-title">${place.name}</div>
-        ${place.cuisine ? `<div class="popup-detail">${place.cuisine}</div>` : ''}
-        ${place.price ? `<div class="popup-price">${place.price}</div>` : ''}
+        <div class="popup-title">${esc(place.name)}</div>
+        ${place.cuisine ? `<div class="popup-detail">${esc(place.cuisine)}</div>` : ''}
+        ${place.price ? `<div class="popup-price">${esc(place.price)}</div>` : ''}
       `);
     });
   }
@@ -593,7 +781,7 @@
       .filter(spot => photos[spot.id] && photos[spot.id].length > 0)
       .map(spot => `
         <div class="photo-spot-section">
-          <div class="photo-spot-title">📍 ${spot.name}</div>
+          <div class="photo-spot-title">📍 ${esc(spot.name)}</div>
           <div class="photo-grid">
             ${photos[spot.id].map(p =>
               `<img src="${p.url}" alt="${spot.name}" loading="lazy">`
@@ -653,6 +841,7 @@
     recalcTimes(day);
     renderSpotList();
     showDayOnMap();
+    saveItinerary();
   }
 
   function onDragEnd(e) {
@@ -679,21 +868,33 @@
   function initSidebarToggle() {
     const sidebar = document.getElementById('sidebar');
     const toggle = document.getElementById('sidebar-toggle');
+    const isMobile = () => window.innerWidth <= 768;
 
     toggle.addEventListener('click', () => {
       const isCollapsed = sidebar.classList.toggle('collapsed');
-      toggle.textContent = isCollapsed ? '▶' : '◀';
-      // Fix mobile
-      if (window.innerWidth <= 768) {
-        toggle.textContent = isCollapsed ? '▲' : '▼';
-      }
+      toggle.textContent = isMobile()
+        ? (isCollapsed ? '▲' : '▼')
+        : (isCollapsed ? '▶' : '◀');
+      // Invalidate map after CSS transition completes
       setTimeout(() => state.map.invalidateSize(), 350);
     });
 
-    // Mobile default label
-    if (window.innerWidth <= 768) {
+    // Set initial label
+    if (isMobile()) {
       toggle.textContent = '▼';
     }
+
+    // Re-invalidate map on orientation change / resize
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        toggle.textContent = isMobile()
+          ? (sidebar.classList.contains('collapsed') ? '▲' : '▼')
+          : (sidebar.classList.contains('collapsed') ? '▶' : '◀');
+        state.map.invalidateSize();
+      }, 200);
+    });
   }
 
   // ==================== Modal Management ====================
@@ -741,6 +942,11 @@
 
     document.getElementById('btn-darkmode').addEventListener('click', toggleDarkMode);
 
+    // Settings
+    document.getElementById('btn-settings').addEventListener('click', () => {
+      openModal('settings-modal');
+    });
+
     // Expense add
     document.getElementById('expense-add').addEventListener('click', addExpense);
 
@@ -785,6 +991,272 @@
     }
   }
 
+  // ==================== Spot Editor ====================
+  function openSpotEditor(existingSpot) {
+    const form = document.getElementById('spot-editor-form');
+    const title = document.getElementById('spot-editor-title');
+
+    if (existingSpot) {
+      title.textContent = '✏️ 編輯景點';
+      document.getElementById('edit-spot-id').value = existingSpot.id;
+      document.getElementById('edit-spot-name').value = existingSpot.name;
+      document.getElementById('edit-spot-time').value = existingSpot.time;
+      document.getElementById('edit-spot-duration').value = existingSpot.duration;
+      document.getElementById('edit-spot-lat').value = existingSpot.lat;
+      document.getElementById('edit-spot-lng').value = existingSpot.lng;
+      document.getElementById('edit-spot-desc').value = existingSpot.description;
+      document.getElementById('edit-spot-tips').value = existingSpot.tips;
+      const t = existingSpot.transportToNext;
+      document.getElementById('edit-transport-mode').value = t ? t.mode : '';
+      document.getElementById('edit-transport-duration').value = t ? t.duration : '';
+      document.getElementById('edit-transport-note').value = t ? t.note : '';
+    } else {
+      title.textContent = '✏️ 新增景點';
+      form.reset();
+      document.getElementById('edit-spot-id').value = '';
+      document.getElementById('edit-spot-time').value = '09:00';
+      document.getElementById('edit-spot-duration').value = '60';
+    }
+
+    openModal('spot-editor-modal');
+  }
+
+  function handleSpotEditorSubmit(e) {
+    e.preventDefault();
+    const id = document.getElementById('edit-spot-id').value;
+    const name = document.getElementById('edit-spot-name').value.trim();
+    const lat = parseFloat(document.getElementById('edit-spot-lat').value);
+    const lng = parseFloat(document.getElementById('edit-spot-lng').value);
+
+    if (!name) { alert('請輸入景點名稱'); return; }
+    if (isNaN(lat) || isNaN(lng)) { alert('請輸入有效的座標'); return; }
+
+    const transportMode = document.getElementById('edit-transport-mode').value;
+    const transportColors = { car: '#3498db', walk: '#f39c12', monorail: '#e74c3c', bus: '#27ae60', taxi: '#9b59b6' };
+    const transport = transportMode ? {
+      mode: transportMode,
+      duration: parseInt(document.getElementById('edit-transport-duration').value, 10) || 0,
+      note: document.getElementById('edit-transport-note').value.trim() || APP_DATA.transportIcons[transportMode] + ' 前往下一站',
+      color: transportColors[transportMode] || '#999'
+    } : null;
+
+    const spotData = {
+      id: id || generateId(),
+      name,
+      lat,
+      lng,
+      time: document.getElementById('edit-spot-time').value || '09:00',
+      duration: parseInt(document.getElementById('edit-spot-duration').value, 10) || 60,
+      description: document.getElementById('edit-spot-desc').value.trim(),
+      tips: document.getElementById('edit-spot-tips').value.trim(),
+      transportToNext: transport,
+      nearby: []
+    };
+
+    const day = state.itinerary[state.currentDay];
+
+    if (id) {
+      // Edit existing
+      const idx = day.spots.findIndex(s => s.id === id);
+      if (idx >= 0) {
+        spotData.nearby = day.spots[idx].nearby;
+        day.spots[idx] = spotData;
+      }
+    } else {
+      // Add new
+      day.spots.push(spotData);
+    }
+
+    recalcTimes(day);
+    saveItinerary();
+    closeModal('spot-editor-modal');
+    renderSpotList();
+    showDayOnMap();
+    scheduleNotifications();
+  }
+
+  function deleteSpot(spotId) {
+    if (!confirm('確定要刪除這個景點嗎？')) return;
+    const day = state.itinerary[state.currentDay];
+    const idx = day.spots.findIndex(s => s.id === spotId);
+    if (idx < 0) return;
+
+    day.spots.splice(idx, 1);
+
+    // Clear stale transport on new last spot
+    if (day.spots.length > 0 && idx === day.spots.length) {
+      day.spots[day.spots.length - 1].transportToNext = null;
+    }
+
+    if (state.currentSpot === spotId) {
+      state.currentSpot = null;
+    }
+
+    recalcTimes(day);
+    saveItinerary();
+    renderSpotList();
+    showDayOnMap();
+    scheduleNotifications();
+  }
+
+  // ==================== Day Management ====================
+  function addDay() {
+    const lastDay = state.itinerary[state.itinerary.length - 1];
+    const lastDate = lastDay ? new Date(lastDay.date + 'T00:00:00') : new Date();
+    const nextDate = new Date(lastDate.getTime() + 86400000);
+
+    state.itinerary.push({
+      day: state.itinerary.length + 1,
+      date: nextDate.toISOString().slice(0, 10),
+      title: `Day ${state.itinerary.length + 1}`,
+      weather: { icon: '🌤️', temp: '--°C', desc: '--', humidity: '--', wind: '--' },
+      spots: []
+    });
+
+    saveItinerary();
+    switchDay(state.itinerary.length - 1);
+  }
+
+  function deleteDay(dayIdx) {
+    if (state.itinerary.length <= 1) return;
+    if (!confirm(`確定要刪除 Day ${state.itinerary[dayIdx].day} 的所有行程嗎？`)) return;
+
+    state.itinerary.splice(dayIdx, 1);
+
+    // Renumber
+    state.itinerary.forEach((d, i) => { d.day = i + 1; });
+
+    // Clamp current day
+    if (state.currentDay >= state.itinerary.length) {
+      state.currentDay = state.itinerary.length - 1;
+    }
+    state.currentSpot = null;
+
+    saveItinerary();
+    renderDayTabs();
+    renderSpotList();
+    showDayOnMap();
+    scheduleNotifications();
+  }
+
+  // ==================== Map Pick ====================
+  function startMapPick() {
+    state.mapPickMode = true;
+    closeModal('spot-editor-modal');
+    document.getElementById('map-pick-overlay').classList.remove('hidden');
+    document.getElementById('fab-add-spot').classList.add('hidden');
+    state.map.getContainer().style.cursor = 'crosshair';
+    state.map.once('click', onMapPick);
+  }
+
+  function onMapPick(e) {
+    document.getElementById('edit-spot-lat').value = e.latlng.lat.toFixed(4);
+    document.getElementById('edit-spot-lng').value = e.latlng.lng.toFixed(4);
+    endMapPick();
+    openModal('spot-editor-modal');
+  }
+
+  function cancelMapPick() {
+    state.map.off('click', onMapPick);
+    endMapPick();
+    openModal('spot-editor-modal');
+  }
+
+  function endMapPick() {
+    state.mapPickMode = false;
+    document.getElementById('map-pick-overlay').classList.add('hidden');
+    document.getElementById('fab-add-spot').classList.remove('hidden');
+    state.map.getContainer().style.cursor = '';
+  }
+
+  // ==================== Import / Export / Reset ====================
+  function exportItinerary() {
+    try {
+      const json = JSON.stringify(state.itinerary, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `okinawa-itinerary-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      alert('匯出失敗：' + e.message);
+    }
+  }
+
+  function importItinerary() {
+    document.getElementById('import-file').click();
+  }
+
+  function handleImportFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (!Array.isArray(data) || data.length === 0) {
+          alert('無效的行程格式：需要是陣列');
+          return;
+        }
+        if (!confirm(`即將載入 ${data.length} 天的行程，會覆蓋目前資料。確定嗎？`)) return;
+
+        state.itinerary = normalizeItinerary(data);
+        state.currentDay = 0;
+        state.currentSpot = null;
+        saveItinerary();
+        renderDayTabs();
+        renderSpotList();
+        showDayOnMap();
+        scheduleNotifications();
+        closeModal('settings-modal');
+        alert('✅ 行程匯入成功！');
+      } catch (err) {
+        alert('匯入失敗：JSON 格式錯誤\n' + err.message);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  }
+
+  function resetItinerary() {
+    if (!confirm('確定要重置為預設行程嗎？所有自訂修改將會遺失。')) return;
+    state.itinerary = JSON.parse(JSON.stringify(APP_DATA.itinerary));
+    state.currentDay = 0;
+    state.currentSpot = null;
+    saveItinerary();
+    renderDayTabs();
+    renderSpotList();
+    showDayOnMap();
+    scheduleNotifications();
+    closeModal('settings-modal');
+  }
+
+  // ==================== Init Itinerary Editor ====================
+  function initItineraryEditor() {
+    // FAB
+    document.getElementById('fab-add-spot').addEventListener('click', () => openSpotEditor(null));
+
+    // Spot editor form submit
+    document.getElementById('spot-editor-form').addEventListener('submit', handleSpotEditorSubmit);
+
+    // Map pick
+    document.getElementById('btn-map-pick').addEventListener('click', startMapPick);
+    document.getElementById('btn-cancel-pick').addEventListener('click', cancelMapPick);
+
+    // Import / Export / Reset / GitHub reload
+    document.getElementById('btn-export').addEventListener('click', exportItinerary);
+    document.getElementById('btn-import').addEventListener('click', importItinerary);
+    document.getElementById('import-file').addEventListener('change', handleImportFile);
+    document.getElementById('btn-reset').addEventListener('click', resetItinerary);
+    document.getElementById('btn-reload-github').addEventListener('click', () => {
+      if (!confirm('確定要從 GitHub 重新載入行程嗎？會覆蓋目前資料。')) return;
+      reloadFromGitHub();
+    });
+  }
+
   // ==================== Utilities ====================
   function calcDistance(lat1, lon1, lat2, lon2) {
     const R = 6371;
@@ -798,14 +1270,22 @@
   function deg2rad(deg) { return deg * (Math.PI / 180); }
 
   // ==================== App Init ====================
-  function init() {
+  async function init() {
     applyDarkMode();
     initMap();
+
+    // On first visit, try to load from GitHub
+    const fetched = await loadItineraryFromGitHub();
+    if (fetched) {
+      console.log('Loaded itinerary from GitHub');
+    }
+
     renderDayTabs();
     renderSpotList();
     showDayOnMap();
     initSidebarToggle();
     initModals();
+    initItineraryEditor();
     initNotifications();
     initPWAInstall();
     registerServiceWorker();

@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>沖繩旅遊地圖</title>
   <meta name="description" content="7天6夜沖繩離線旅遊地圖">
   <meta name="theme-color" content="#0f3460">
@@ -27,6 +27,7 @@
       <button id="btn-checklist" class="header-btn" title="行前清單">📋</button>
       <button id="btn-photo" class="header-btn" title="照片回憶">📸</button>
       <button id="btn-darkmode" class="header-btn" title="深色模式">🌙</button>
+      <button id="btn-settings" class="header-btn" title="行程管理">⚙️</button>
     </div>
   </header>
 
@@ -108,6 +109,120 @@
       </div>
     </div>
   </div>
+
+  <!-- Spot Editor Modal -->
+  <div id="spot-editor-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="spot-editor-title">✏️ 新增景點</h2>
+        <button class="modal-close" data-modal="spot-editor-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="spot-editor-form">
+          <input type="hidden" id="edit-spot-id">
+          <div class="form-group">
+            <label for="edit-spot-name">景點名稱 *</label>
+            <input type="text" id="edit-spot-name" required placeholder="例：美麗海水族館">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-spot-time">開始時間</label>
+              <input type="time" id="edit-spot-time" value="09:00">
+            </div>
+            <div class="form-group">
+              <label for="edit-spot-duration">停留(分鐘)</label>
+              <input type="number" id="edit-spot-duration" value="60" min="5" max="480">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-spot-lat">緯度 *</label>
+              <input type="number" id="edit-spot-lat" step="0.0001" required placeholder="26.3344">
+            </div>
+            <div class="form-group">
+              <label for="edit-spot-lng">經度 *</label>
+              <input type="number" id="edit-spot-lng" step="0.0001" required placeholder="127.7731">
+            </div>
+          </div>
+          <button type="button" id="btn-map-pick" class="btn-secondary">📍 從地圖選取座標</button>
+          <div class="form-group">
+            <label for="edit-spot-desc">描述</label>
+            <textarea id="edit-spot-desc" rows="2" placeholder="景點簡介"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="edit-spot-tips">旅遊小提示</label>
+            <textarea id="edit-spot-tips" rows="2" placeholder="💡 實用建議"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-transport-mode">前往下一站方式</label>
+              <select id="edit-transport-mode">
+                <option value="">（無）</option>
+                <option value="car">🚗 開車</option>
+                <option value="walk">🚶 步行</option>
+                <option value="monorail">🚝 單軌</option>
+                <option value="bus">🚌 公車</option>
+                <option value="taxi">🚕 計程車</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="edit-transport-duration">車程(分鐘)</label>
+              <input type="number" id="edit-transport-duration" min="0" max="300" placeholder="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="edit-transport-note">交通備註</label>
+            <input type="text" id="edit-transport-note" placeholder="例：走 58 號國道">
+          </div>
+          <button type="submit" class="btn-primary" id="btn-save-spot">💾 儲存</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>⚙️ 行程管理</h2>
+        <button class="modal-close" data-modal="settings-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="settings-section">
+          <h3>☁️ 從 GitHub 載入行程</h3>
+          <p class="settings-desc">從 GitHub 上重新抓取預設行程（會覆蓋目前資料）</p>
+          <button id="btn-reload-github" class="btn-primary">🔄 從 GitHub 重新載入</button>
+        </div>
+        <div class="settings-section">
+          <h3>📤 匯出行程</h3>
+          <p class="settings-desc">將目前行程下載為 JSON 檔案，可分享給朋友</p>
+          <button id="btn-export" class="btn-primary">📥 下載 JSON</button>
+        </div>
+        <div class="settings-section">
+          <h3>📥 匯入行程</h3>
+          <p class="settings-desc">從 JSON 檔案載入行程（會覆蓋目前資料）</p>
+          <input type="file" id="import-file" accept=".json,application/json" class="hidden">
+          <button id="btn-import" class="btn-secondary">📂 選擇檔案</button>
+        </div>
+        <div class="settings-section">
+          <h3>🔄 重置行程</h3>
+          <p class="settings-desc">恢復為內建預設的 7 天行程（離線可用）</p>
+          <button id="btn-reset" class="btn-danger">🗑️ 重置為預設</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Map Pick Overlay -->
+  <div id="map-pick-overlay" class="hidden">
+    <div class="map-pick-bar">
+      <span>📍 點擊地圖選取座標</span>
+      <button id="btn-cancel-pick" class="btn-secondary">取消</button>
+    </div>
+  </div>
+
+  <!-- FAB: Add Spot -->
+  <button id="fab-add-spot" class="fab" title="新增景點">＋</button>
 
   <!-- Notification Permission Banner -->
   <div id="notification-banner" class="hidden">

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'okinawa-travel-v1';
+const CACHE_NAME = 'okinawa-travel-v2';
 const TILE_CACHE = 'okinawa-tiles-v1';
 
 const APP_SHELL = [
@@ -8,6 +8,7 @@ const APP_SHELL = [
   './js/data.js',
   './js/app.js',
   './manifest.json',
+  './data/itinerary.json',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
 ];

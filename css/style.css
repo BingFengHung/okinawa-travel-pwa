@@ -595,20 +595,254 @@ body {
 .popup-detail { font-size: 12px; color: #666; }
 .popup-price { font-weight: 600; color: var(--accent); }
 
-/* ====== Responsive ====== */
-@media (max-width: 768px) {
-  :root { --sidebar-width: 100vw; }
+/* ====== Spot Editor & Settings ====== */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+  flex: 1;
+}
 
-  #main {
-    flex-direction: column-reverse;
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 15px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  width: 100%;
+}
+
+.form-group textarea { resize: vertical; }
+
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: opacity 0.2s;
+}
+.btn-primary:hover { opacity: 0.9; }
+
+.btn-secondary {
+  width: 100%;
+  padding: 10px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: all 0.2s;
+}
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+.btn-danger {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-danger:hover { background: var(--accent); color: #fff; }
+
+.settings-section {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+.settings-section:last-child { border-bottom: none; }
+.settings-section h3 { font-size: 15px; margin-bottom: 4px; }
+.settings-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
+
+/* Spot card edit/delete actions */
+.spot-edit-actions {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.spot-edit-btn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.spot-edit-btn:hover { background: rgba(0,0,0,0.08); }
+.dark .spot-edit-btn:hover { background: rgba(255,255,255,0.1); }
+
+/* Day tab management buttons */
+.day-tab-add {
+  flex-shrink: 0;
+  padding: 10px 14px;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.day-tab-add:hover { background: rgba(233,69,96,0.08); }
+
+.day-tab-delete {
+  font-size: 10px;
+  margin-left: 4px;
+  opacity: 0.5;
+  cursor: pointer;
+}
+.day-tab:hover .day-tab-delete { opacity: 1; }
+
+/* FAB (Floating Action Button) */
+.fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-size: 28px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(233,69,96,0.4);
+  z-index: 1500;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.fab:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(233,69,96,0.5); }
+.fab:active { transform: scale(0.95); }
+
+/* Map Pick Overlay */
+#map-pick-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2500;
+  pointer-events: none;
+}
+
+.map-pick-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 14px 20px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  pointer-events: auto;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.map-pick-bar .btn-secondary {
+  width: auto;
+  margin: 0;
+  padding: 8px 16px;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  border-color: rgba(255,255,255,0.4);
+}
+
+/* ====== Responsive — Mobile ====== */
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 100vw;
+    --header-height: 50px;
   }
 
+  body {
+    height: 100vh;
+    height: 100dvh;
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  /* --- Mobile Header --- */
+  #header {
+    height: var(--header-height);
+    padding: 0 8px;
+  }
+
+  .header-left h1 {
+    font-size: 15px;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .header-right {
+    gap: 0;
+  }
+
+  .header-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* --- Mobile Main Layout --- */
+  #main {
+    flex-direction: column-reverse;
+    height: calc(100vh - var(--header-height));
+    height: calc(100dvh - var(--header-height));
+  }
+
+  /* --- Mobile Sidebar (Bottom Sheet) --- */
   #sidebar {
     width: 100%;
     min-width: 100%;
-    height: 45vh;
+    height: 50%;
+    max-height: 60%;
     border-right: none;
-    border-top: 1px solid var(--border);
+    border-top: none;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+    transition: height 0.3s ease, min-height 0.3s;
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
   #sidebar.collapsed {
@@ -616,24 +850,224 @@ body {
     min-height: 0;
     min-width: 100%;
     width: 100%;
+    box-shadow: none;
   }
 
+  /* --- Bottom Sheet Handle --- */
   #sidebar-toggle {
     right: 50%;
     transform: translateX(50%);
-    top: -28px;
-    width: 56px;
-    height: 28px;
-    border-radius: 8px 8px 0 0;
+    top: -32px;
+    width: 64px;
+    height: 32px;
+    border-radius: 12px 12px 0 0;
+    font-size: 12px;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
   }
 
-  #map { height: 55vh; }
+  /* --- Map fills remaining space --- */
+  #map {
+    flex: 1;
+    min-height: 30%;
+  }
+
+  /* --- Day Tabs: Larger touch targets --- */
+  .day-tab {
+    padding: 12px 16px;
+    font-size: 14px;
+    min-height: 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* --- Spot Cards: Touch-friendly --- */
+  .spot-card {
+    padding: 16px;
+    margin-bottom: 12px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .spot-name { font-size: 16px; }
+  .spot-time { font-size: 13px; }
+  .spot-desc { font-size: 14px; }
+  .spot-tips { font-size: 13px; }
+
+  .spot-actions {
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .spot-action-btn {
+    font-size: 13px;
+    padding: 8px 14px;
+    min-height: 36px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* --- Reorder Buttons (Mobile) --- */
+  .reorder-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .reorder-btn:active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  /* --- Mobile Modals (Bottom Sheet Style) --- */
+  .modal {
+    align-items: flex-end;
+    padding: 0;
+  }
 
   .modal-content {
     max-width: 100%;
-    max-height: 90vh;
-    border-radius: var(--radius) var(--radius) 0 0;
+    max-height: 92vh;
+    max-height: 92dvh;
+    border-radius: 16px 16px 0 0;
+    animation: slideUp 0.3s ease;
   }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  .modal-header {
+    padding: 12px 16px;
+    position: sticky;
+    top: 0;
+    background: var(--bg-card);
+    z-index: 1;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .modal-header h2 { font-size: 16px; }
+
+  .modal-close {
+    width: 40px;
+    height: 40px;
+    font-size: 28px;
+  }
+
+  .modal-body {
+    padding: 16px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* --- Expense form mobile --- */
+  #expense-form {
+    gap: 10px;
+  }
+
+  #expense-form select,
+  #expense-form input {
+    font-size: 16px;
+    padding: 10px 12px;
+    min-height: 44px;
+  }
+
+  #expense-add {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    min-height: 44px;
+  }
+
+  .expense-item {
+    padding: 12px 0;
+    font-size: 15px;
+  }
+
+  /* --- Checklist mobile --- */
+  .checklist-item {
+    padding: 10px 0;
+    font-size: 15px;
+    min-height: 44px;
+  }
+
+  .checklist-item input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* --- Weather mobile --- */
+  .weather-card {
+    padding: 16px;
+  }
+
+  /* --- Banners mobile --- */
+  #notification-banner,
+  #install-banner {
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    left: 8px;
+    right: 8px;
+    transform: none;
+    max-width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  #notification-banner p,
+  #install-banner p {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  #notification-banner button,
+  #install-banner button {
+    padding: 10px 20px;
+    font-size: 14px;
+    min-height: 40px;
+  }
+
+  /* --- Transport connector mobile --- */
+  .transport-connector {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  /* --- FAB mobile position --- */
+  .fab {
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    right: 16px;
+    width: 52px;
+    height: 52px;
+    font-size: 26px;
+  }
+
+  /* --- Form mobile --- */
+  .form-row { flex-direction: column; gap: 0; }
+  .form-group input,
+  .form-group textarea,
+  .form-group select { font-size: 16px; }
+}
+
+/* Touch device improvements */
+@media (pointer: coarse) {
+  .spot-card { cursor: default; }
+  .spot-card:hover { transform: none; }
+  .spot-card.active { transform: none; }
+  .header-btn:hover { background: none; }
+  .header-btn:active { background: rgba(255,255,255,0.2); }
+  .spot-action-btn:hover { background: var(--bg); color: var(--text); border-color: var(--border); }
+  .spot-action-btn:active { background: var(--accent); color: #fff; border-color: var(--accent); }
 }
 
 /* ====== Scrollbar ====== */
